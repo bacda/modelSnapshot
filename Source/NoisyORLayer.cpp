@@ -1,4 +1,4 @@
-#include "noisy_or/NoisyORLayer.h"
+#include "NoisyORLayer.h"
 
 #include "noisy_or/NoisyORUtilities.h"
 

@@ -7,9 +7,9 @@
 namespace noisy_or {
 
 struct OnlineEMOptions {
-    double predictionLearningRate = 0.01;
-    double filterLearningRate = 0.01;
-    double baseRateLearningRate = 0.01;
+    double predictionLearningRate = 0.001;
+    double filterLearningRate = 0.001;
+    double baseRateLearningRate = 0.001;
     double epsilon = 1e-6;
 
     // The Max implementation thresholds x_i at 0.5. Disable this to use

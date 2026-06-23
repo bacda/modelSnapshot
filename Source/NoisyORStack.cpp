@@ -42,6 +42,20 @@ void NoisyORStack::initialize()
     initialized_ = true;
 }
 
+void NoisyORStack::initialize(
+    const std::vector<Eigen::VectorXd>& initialTopDownSupport)
+{
+    if (initialTopDownSupport.size() != layers_.size()) {
+        throw std::invalid_argument(
+            "There must be one initial top-down vector per layer");
+    }
+    for (std::size_t index = 0; index < layers_.size(); ++index) {
+        layers_[index].initialize(initialTopDownSupport[index]);
+    }
+    outputs_.assign(layers_.size(), LayerOutput{});
+    initialized_ = true;
+}
+
 const std::vector<LayerOutput>& NoisyORStack::step(
     const Eigen::VectorXd& bottomObservation,
     const Eigen::VectorXd& externalTopDownSupport)

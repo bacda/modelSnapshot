@@ -600,6 +600,10 @@
       <FILE id="W1UeWE" name="MainComponent.h" compile="0" resource="0" file="Source/MainComponent.h"/>
       <FILE id="X2pgXN" name="MainComponent.cpp" compile="1" resource="0"
             file="Source/MainComponent.cpp"/>
+      <FILE id="bZK32a" name="NoisyORStateIO.cpp" compile="1" resource="0"
+            file="Source/NoisyORStateIO.cpp"/>
+      <FILE id="JFduyd" name="NoisyORStateIO.h" compile="0" resource="0"
+            file="Source/NoisyORStateIO.h"/>
     </GROUP>
   </MAINGROUP>
   <MODULES>

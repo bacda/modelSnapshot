@@ -11,6 +11,8 @@ public:
     explicit NoisyORStack(std::vector<LayerConfiguration> configurations);
 
     void initialize();
+    void initialize(
+        const std::vector<Eigen::VectorXd>& initialTopDownSupport);
 
     // Runs candidate selection and inference bottom-up, then preserves the
     // next-step activation evidence top-down.
