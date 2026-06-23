@@ -1,0 +1,14 @@
+# Ignore everything at the project root
+/*
+
+# Track repository configuration and Projucer project
+!/.gitignore
+!/*.jucer
+
+# Allow Source, then select only its top-level C++ files
+!/Source/
+/Source/*
+!/Source/*.cpp
+!/Source/*.h
+!/Source/*.hpp
+
