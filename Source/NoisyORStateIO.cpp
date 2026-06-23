@@ -57,12 +57,38 @@ struct FilePatch {
     std::vector<LayerPatch> layers;
 };
 
-std::vector<std::string> tokenize(const std::filesystem::path& path)
+std::string parentPath(const std::string& path)
+{
+    const std::string::size_type separator = path.find_last_of("/\\");
+    if (separator == std::string::npos) return {};
+    if (separator == 0) return path.substr(0, 1);
+    return path.substr(0, separator);
+}
+
+bool isAbsolutePath(const std::string& path)
+{
+    if (path.empty()) return false;
+    if (path.front() == '/' || path.front() == '\\') return true;
+    return path.size() >= 3
+        && std::isalpha(static_cast<unsigned char>(path[0]))
+        && path[1] == ':'
+        && (path[2] == '/' || path[2] == '\\');
+}
+
+std::string joinPath(const std::string& baseDirectory, const std::string& path)
+{
+    if (baseDirectory.empty() || isAbsolutePath(path)) return path;
+    const char last = baseDirectory.back();
+    if (last == '/' || last == '\\') return baseDirectory + path;
+    return baseDirectory + '/' + path;
+}
+
+std::vector<std::string> tokenize(const std::string& path)
 {
     std::ifstream input(path);
     if (!input) {
         throw std::runtime_error(
-            "Could not open state file: " + path.string());
+            "Could not open state file: " + path);
     }
 
     std::vector<std::string> tokens;
@@ -99,7 +125,7 @@ std::vector<std::string> tokenize(const std::filesystem::path& path)
 
         if (quoted) {
             throw std::runtime_error(
-                "Unterminated quote in state file: " + path.string());
+                "Unterminated quote in state file: " + path);
         }
         flush();
     }
@@ -110,7 +136,7 @@ std::vector<std::string> tokenize(const std::filesystem::path& path)
 class TokenReader {
 public:
     TokenReader(std::vector<std::string> tokens,
-                std::filesystem::path source)
+                std::string source)
         : tokens_(std::move(tokens)), source_(std::move(source)) {}
 
     bool empty() const noexcept { return position_ >= tokens_.size(); }
@@ -172,13 +198,13 @@ public:
     [[noreturn]] void fail(const std::string& message) const
     {
         throw std::runtime_error(
-            source_.string() + " near token "
+            source_ + " near token "
             + std::to_string(position_ + 1) + ": " + message);
     }
 
 private:
     std::vector<std::string> tokens_;
-    std::filesystem::path source_;
+    std::string source_;
     std::size_t position_ = 0;
 };
 
@@ -199,7 +225,7 @@ Eigen::MatrixXd readInlineMatrix(TokenReader& reader)
 }
 
 Eigen::MatrixXd readExternalMatrix(
-    const std::filesystem::path& path,
+    const std::string& path,
     std::size_t rows,
     std::size_t columns)
 {
@@ -221,15 +247,14 @@ Eigen::MatrixXd readExternalMatrix(
 
 Eigen::MatrixXd readMatrixValue(
     TokenReader& reader,
-    const std::filesystem::path& baseDirectory)
+    const std::string& baseDirectory)
 {
     const std::string mode = reader.take();
     if (mode == "INLINE") {
         return readInlineMatrix(reader);
     }
     if (mode == "FILE") {
-        std::filesystem::path path = reader.take();
-        if (path.is_relative()) path = baseDirectory / path;
+        std::string path = joinPath(baseDirectory, reader.take());
         const std::size_t rows = reader.size("matrix row count");
         const std::size_t columns = reader.size("matrix column count");
         return readExternalMatrix(path, rows, columns);
@@ -239,7 +264,7 @@ Eigen::MatrixXd readMatrixValue(
 
 MatrixSource readParameterSource(
     TokenReader& reader,
-    const std::filesystem::path& baseDirectory)
+    const std::string& baseDirectory)
 {
     const std::string mode = reader.peek();
     if (mode == "INLINE" || mode == "FILE") {
@@ -261,12 +286,12 @@ MatrixSource readParameterSource(
     reader.fail("Expected INLINE, FILE, or RANDOM, received " + mode);
 }
 
-FilePatch parsePatch(const std::filesystem::path& path)
+FilePatch parsePatch(const std::string& path)
 {
     TokenReader reader(tokenize(path), path);
     FilePatch patch;
     std::optional<std::size_t> currentLayer;
-    const auto baseDirectory = path.parent_path();
+    const std::string baseDirectory = parentPath(path);
 
     if (!reader.empty() && reader.peek() == "NOISY_OR_STATE") {
         reader.take();
@@ -506,7 +531,7 @@ void validateLearning(const OnlineEMOptions& learning)
 } // namespace
 
 StateLoadResult loadModelState(
-    const std::filesystem::path& path,
+    const std::string& path,
     const ModelState* previous,
     const StateLoadDefaults& defaults)
 {

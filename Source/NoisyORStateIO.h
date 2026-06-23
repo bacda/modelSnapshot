@@ -5,7 +5,6 @@
 
 #include <cstddef>
 #include <cstdint>
-#include <filesystem>
 #include <string>
 #include <vector>
 
@@ -56,7 +55,7 @@ struct StateLoadResult {
 // compatible fields retain previous values; otherwise documented defaults and
 // Beta random initialization are used. Every fallback emits a warning.
 StateLoadResult loadModelState(
-    const std::filesystem::path& path,
+    const std::string& path,
     const ModelState* previous = nullptr,
     const StateLoadDefaults& defaults = {});
 
