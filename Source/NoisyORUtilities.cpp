@@ -1,4 +1,4 @@
-#include "noisy_or/NoisyORUtilities.h"
+#include "NoisyORUtilities.h"
 
 #include <cmath>
 #include <limits>

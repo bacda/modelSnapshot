@@ -1,0 +1,6 @@
+NOISY_OR_STATE 1
+
+# Patch only the candidate-selection policy for layer 0.
+LAYER 0
+CANDIDATE_SELECTION 0.02 0.02 0.015 0.02 0 16
+END_LAYER

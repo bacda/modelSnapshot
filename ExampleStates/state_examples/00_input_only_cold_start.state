@@ -1,0 +1,11 @@
+NOISY_OR_STATE 1
+
+# Cold start: infer N=4 from X. The loader defaults to one layer, K=3,
+# context order 1, Beta-random F/R, and default parameters.
+INPUT INLINE 6 4
+1 0 0 1
+0 1 0 0
+1 0 1 0
+0 0 1 1
+1 1 0 0
+0 1 1 0

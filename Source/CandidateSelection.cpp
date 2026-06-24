@@ -1,4 +1,4 @@
-#include "noisy_or/CandidateSelection.h"
+#include "CandidateSelection.h"
 
 #include <cmath>
 #include <stdexcept>

@@ -1,0 +1,9 @@
+NOISY_OR_STATE 1
+
+# Patch: when a previous ModelState is supplied, only X changes. Learned F, R,
+# base rates, contexts, policies, learning settings, and layer count remain.
+INPUT INLINE 4 4
+1 0 0 0
+0 1 0 0
+0 0 1 0
+0 0 0 1

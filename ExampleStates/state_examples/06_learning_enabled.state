@@ -1,0 +1,19 @@
+NOISY_OR_STATE 1
+
+INPUT INLINE 6 4
+1.0 0.0 0.8 0.0
+0.0 0.9 0.0 0.1
+0.8 0.0 1.0 0.0
+0.0 0.2 0.9 0.0
+1.0 0.8 0.0 0.0
+0.0 0.7 0.8 0.0
+
+LAYERS 1
+LAYER 0
+DIMENSIONS 4 3 2
+R RANDOM 0.05 1.0 300
+F RANDOM 0.05 1.0 301
+
+# Learning enabled. Observations remain fractional because binarize=0.
+EM 1 0.001 0.001 0.001 0.000001 0 0.5
+END_LAYER

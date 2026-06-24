@@ -1,0 +1,21 @@
+NOISY_OR_STATE 1
+
+# Resume from the third row of a replacement input and explicit temporal state.
+INPUT INLINE 5 4
+1 0 0 1
+0 1 1 0
+1 0 1 0
+0 0 0 1
+1 1 0 0
+LOOP 1
+INPUT_INDEX 2
+
+LAYER 0
+CONTEXT INLINE 4 2
+1 0
+0 1
+1 0
+0 0
+TOP_DOWN INLINE 1 3
+0.20 0.05 0.40
+END_LAYER

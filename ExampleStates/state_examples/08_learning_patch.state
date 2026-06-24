@@ -1,0 +1,6 @@
+NOISY_OR_STATE 1
+
+# Enable learning without changing model parameters or input.
+LAYER 0
+EM 1 0.0005 0.0005 0.001 0.000001 0 0.5
+END_LAYER

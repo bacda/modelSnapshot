@@ -1,0 +1,6 @@
+NOISY_OR_STATE 1
+
+# Replace only layer-0 R. Dimensions are inherited from the previous state.
+LAYER 0
+R RANDOM 0.05 1.0 9876
+END_LAYER

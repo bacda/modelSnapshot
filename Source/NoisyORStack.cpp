@@ -1,4 +1,4 @@
-#include "noisy_or/NoisyORStack.h"
+#include "NoisyORStack.h"
 
 #include <stdexcept>
 #include <utility>

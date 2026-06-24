@@ -1,6 +1,6 @@
-#include "noisy_or/NoisyORLearning.h"
+#include "NoisyORLearning.h"
 
-#include "noisy_or/NoisyORUtilities.h"
+#include "NoisyORUtilities.h"
 
 #include <algorithm>
 #include <cmath>
