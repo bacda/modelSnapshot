@@ -5,34 +5,9 @@ This is an ongoing research implementation of a hierarchical latent-variable Noi
 
 The implementation includes a state and tracing system designed to make model runs reproducible, inspectable, and shareable. This is important because the model is online: its behaviour at any timestep depends not only on the learned parameters, but also on the current context windows, activation priors, input position, and timestep counter.
 
----
-
 ###### **`.state` Files**
 
-Model configurations and checkpoints are stored using human-readable `.state` files. A `.state` file describes the current model state, including:
-
-- the input sequence,
-- whether the input loops,
-- the current input index,
-- the global timestep counter,
-- the number of layers,
-- each layer’s dimensions,
-- prediction matrices `R`,
-- temporal filters `F`,
-- leak probabilities,
-- generator parameters,
-- candidate-selection settings,
-- online EM learning settings,
-- context windows,
-- initial top-down support.
-
-A saved `.state` file is intended to be a self-contained checkpoint. Loading it reconstructs the model, including learned parameters and temporal context, so that a run can be resumed or reproduced from that point.
-
-The state loader also supports partial state descriptions. If a field is omitted and a compatible previous model exists, the loader can preserve the existing value. Otherwise, it falls back to documented defaults. This makes `.state` files useful both as full checkpoints and as lightweight experimental configuration files.
-
-The timestep counter is part of the state. It therefore persists across saves and loads, can be reset manually in the interface, and continues to advance during both ordinary GUI stepping and offline `Fast N` runs.
-
----
+Model configurations and checkpoints are stored using human-readable `.state` files. A `.state` file describes the current model state and is intended as a self-contained checkpoint: Loading it reconstructs the model, including learned parameters and temporal context, so that a run can be resumed or reproduced from that point. The state loader also supports partial state descriptions.
 
 ###### **Interactive State Display**
 
@@ -55,11 +30,9 @@ The JUCE interface provides a live view of the current model state. It displays 
 
 Most of these quantities are shown as grayscale matrices or vectors, so the interface can be used as a live diagnostic tool. Several parameters can also be edited directly from the GUI, allowing interactive experimentation while the model is running.
 
----
-
 ###### **JSONL Step Logging**
 
-The model can also write a detailed run log in JSONL format. Logging only occurs when the `Log` checkbox is enabled. If logging is not enabled, no step records are written.
+The model can also write a detailed run log in JSONL format.
 
 When logging starts, the application creates or appends to the current `.jsonl` log file. The logging controls allow the current file to be renamed, cleared, or reused. A typical log contains:
 
@@ -68,25 +41,9 @@ When logging starts, the application creates or appends to the current `.jsonl` 
 3. one JSON object per model step,
 4. a final full-precision state snapshot when logging stops.
 
-Each step record includes the timestep, input row, observation vector, and per-layer diagnostic quantities such as:
+Each step record includes the timestep, input row, observation vector, and various per-layer diagnostic quantities.
 
-- log evidence,
-- candidate count,
-- selected generators,
-- top-down prior,
-- inherited alpha,
-- next alpha,
-- `qF`,
-- `mu`,
-- reconstruction,
-- current `R`,
-- current `F`,
-- activation error,
-- base-rate delta,
-- `R_delta`,
-- `F_delta`.
-
-Step records use compact numeric formatting for readability, while state snapshots preserve full precision. This means the log can be used both for qualitative inspection and for later reconstruction of the initial or final model state.
+The can be used both for qualitative inspection and for later reconstruction of the initial or final model state.
 
 ---
 
