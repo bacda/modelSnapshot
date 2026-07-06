@@ -15,10 +15,9 @@ The JUCE interface provides a live view of the current model state. It displays 
 
 - `R`: generator prediction vectors,
 - `F`: temporal filters,
-- generator parameters such as base rate, weight, amplitude, and centering,
-- top-down prior support, when present,
-- inherited/current-step alpha,
-- next-step alpha,
+- top-down prior signal,
+- inherited/current-step activation vector,
+- next-step activation vector,
 - filter match `qF`,
 - posterior marginal activation `mu`,
 - reconstruction,
