@@ -1,3 +1,9 @@
+# Online Hierarchical Bayesian Model for Musical Structure Perception
+
+This is an ongoing research implementation of a hierarchical latent-variable Noisy-OR statistical model for online processing of sequential multivariate data. The code is being developed alongside the theoretical model and experimental work. This repository contains a working prototype as part of my reasearch on computational modelling of musical structure perception. At its core, the system is an online bayesian inference model. It ingests a multivariate time series one timestep at a time, learns sparse latent generators that act as local temporal predictors, and uses combinations of these generators to reconstruct the current observation and predict future structure. The code is written as a self-contained C++ library using Eigen, with a JUCE-based interface and logging/state-tracing tools for inspecting the model during experimental runs.
+
+## Mathematical Model
+
 We take as input a time-discrete multivariate process
 
 ```math
@@ -5,8 +11,7 @@ X := (X_t)_{t \in \mathbb{N}},
 \qquad
 X_t \in [0,1]^n.
 ```
-
-The binary case $X_t \in \{0,1\}^n$ is a special case. Each component $X_{t,i}$ represents the presence or intensity of an event in channel $i$. The signal is ingested sequentially.
+Each component $X_{t,i}$ represents the presence or intensity of an event in channel $i$. The signal is ingested sequentially.
 
 The model is a hierarchical online Bayesian latent-variable model. Each layer learns a set of latent generators which act as sparse local temporal predictors. These generators infer which latent causes are currently active, reconstruct the current observation, and prepare a prediction/prior for the next timestep.
 
@@ -135,7 +140,7 @@ The activation prior is then
 =
 \sigma
 \left(
-\operatorname{logit}(b_k)
+\mathrm{logit}(b_k)
 +
 A_k(e^l_{t,k}-c_k)
 \right).
@@ -281,7 +286,7 @@ The vector $\boldsymbol{\mu}^l_t$ is passed upward as the observation for the ne
 
 ###### **Top-Down Prediction**
 
-After the upward inference pass, the model performs a top-down preparation step.
+After the upward inference and bayes update pass, the model performs a top-down prior step.
 
 For a lower layer $l$, the top-down support used for the next timestep is the reconstruction produced by the layer above:
 
@@ -401,3 +406,4 @@ The generators therefore serve two roles:
 This makes the representation compositional: an observation can be explained by several active generators, each accounting for part of the multivariate signal.
 
 Rather than thinking of higher layers as simply storing nested chunks, a better picture is that each layer produces a moving field of posterior beliefs. These posterior beliefs become the signal observed by the next layer, while higher layers return top-down support that shapes the priors of lower-layer generators.
+
