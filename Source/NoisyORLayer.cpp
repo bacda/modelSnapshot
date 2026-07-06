@@ -123,6 +123,7 @@ const LayerOutput& NoisyORLayer::observe(
 
     output_.observation = observation;
     output_.context = context_;
+    output_.topDownSupport = topDownSupport_;
     output_.alpha = alpha_;
     output_.filterMatch = filterMatch_;
     output_.states = expandCandidates(
@@ -135,6 +136,7 @@ const LayerOutput& NoisyORLayer::observe(
     const Eigen::VectorXd logJoint = logPrior + logLikelihood;
 
     output_.prior = logPrior.array().exp().matrix();
+    output_.likelihood = logLikelihood.array().exp().matrix();
     output_.logEvidence = logSumExp(logJoint);
     output_.posterior =
         (logJoint.array() - output_.logEvidence).exp().matrix();
@@ -312,6 +314,10 @@ const Eigen::MatrixXd& NoisyORLayer::context() const noexcept
 const std::vector<State>& NoisyORLayer::candidates() const noexcept
 {
     return output_.selection.candidates;
+}
+LayerConfiguration& NoisyORLayer::configuration() noexcept
+{
+    return configuration_;
 }
 const LayerConfiguration& NoisyORLayer::configuration() const noexcept
 {

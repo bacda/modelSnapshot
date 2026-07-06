@@ -587,6 +587,10 @@
             file="Source/NoisyORLearning.h"/>
       <FILE id="OJVxd9" name="NoisyORUtilities.cpp" compile="1" resource="0"
             file="Source/NoisyORUtilities.cpp"/>
+      <FILE id="gf000b" name="LayerStateDisplay.cpp" compile="1" resource="0"
+            file="Source/LayerStateDisplay.cpp"/>
+      <FILE id="fbpRpN" name="LayerStateDisplay.h" compile="0" resource="0"
+            file="Source/LayerStateDisplay.h"/>
       <FILE id="FE9VG0" name="NoisyORUtilities.h" compile="0" resource="0"
             file="Source/NoisyORUtilities.h"/>
       <FILE id="ubKGBw" name="NoisyOR.h" compile="0" resource="0" file="Source/NoisyOR.h"/>
@@ -604,6 +608,10 @@
             file="Source/NoisyORStateIO.cpp"/>
       <FILE id="JFduyd" name="NoisyORStateIO.h" compile="0" resource="0"
             file="Source/NoisyORStateIO.h"/>
+      <FILE id="FmcAB8" name="LogTracePlotter.cpp" compile="1" resource="0"
+            file="Source/LogTracePlotter.cpp"/>
+      <FILE id="nNbr9G" name="LogTracePlotter.h" compile="0" resource="0"
+            file="Source/LogTracePlotter.h"/>
     </GROUP>
   </MAINGROUP>
   <MODULES>

@@ -34,11 +34,13 @@ struct LayerOutput {
     CandidateSelectionResult selection;
     Eigen::VectorXd observation;     // N, observation used in this E-step
     Eigen::MatrixXd context;         // N x order, context used in this E-step
+    Eigen::VectorXd topDownSupport;  // K tau values used in this E-step
     Eigen::VectorXd alpha;           // K prior activations used in this E-step
     Eigen::VectorXd filterMatch;     // K qF values used in this E-step
     BinaryMatrix states;             // M x K expanded candidate states
     Eigen::MatrixXd statePredictions; // M x N Noisy-OR probabilities
-    Eigen::VectorXd prior;           // M probabilities on selection.candidates
+    Eigen::VectorXd prior;           // M candidate-conditioned prior probabilities
+    Eigen::VectorXd likelihood;      // M likelihood values p(x_t | z_m); not normalized
     Eigen::VectorXd posterior;       // M probabilities on selection.candidates
     Eigen::VectorXd marginals;       // K probabilities E[z_t | x_1:t]
     Eigen::VectorXd reconstruction;  // N probabilities E[x_t | x_1:t]
@@ -75,6 +77,7 @@ public:
     const Eigen::VectorXd& topDownSupport() const noexcept;
     const Eigen::MatrixXd& context() const noexcept;
     const std::vector<State>& candidates() const noexcept;
+    LayerConfiguration& configuration() noexcept;
     const LayerConfiguration& configuration() const noexcept;
 
 private:

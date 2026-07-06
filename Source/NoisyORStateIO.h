@@ -21,6 +21,7 @@ struct ModelState {
     Eigen::MatrixXd input; // T x N_0; may be empty for externally supplied x
     bool loopInput = true;
     std::size_t inputIndex = 0;
+    std::uint64_t stepCount = 0;
     std::vector<LayerState> layers;
 };
 
@@ -72,7 +73,33 @@ ModelState snapshotModelState(
     const NoisyORStack& stack,
     const ModelState& state);
 
+// Writes a complete, self-contained .state file using INLINE matrices.
+// The saved file is intended as a checkpoint and can be loaded without any
+// previous state. Call snapshotModelState(stack, state) before saving if a
+// running model may contain learned parameters or updated context.
+void saveModelState(
+    const std::string& path,
+    const ModelState& state);
+
 // Returns false when no input is stored or a non-looping sequence is exhausted.
 bool readNextInput(ModelState& state, Eigen::VectorXd& observation);
+
+// Random initialization helpers shared by the state loader and UI controls.
+// Entries are sampled independently from Beta(shapeA, shapeB). Each filter
+// matrix F_k is L1-normalized after sampling.
+Eigen::MatrixXd makeRandomPredictions(
+    Eigen::Index generatorCount,
+    Eigen::Index channelCount,
+    double betaShapeA,
+    double betaShapeB,
+    std::uint64_t seed);
+
+std::vector<Eigen::MatrixXd> makeRandomFilters(
+    Eigen::Index generatorCount,
+    Eigen::Index channelCount,
+    Eigen::Index contextOrder,
+    double betaShapeA,
+    double betaShapeB,
+    std::uint64_t seed);
 
 } // namespace noisy_or

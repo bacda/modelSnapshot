@@ -6,6 +6,7 @@
 #include <cctype>
 #include <cmath>
 #include <fstream>
+#include <iomanip>
 #include <limits>
 #include <optional>
 #include <random>
@@ -53,6 +54,7 @@ struct FilePatch {
     std::optional<Eigen::MatrixXd> input;
     std::optional<bool> loopInput;
     std::optional<std::size_t> inputIndex;
+    std::optional<std::uint64_t> stepCount;
     std::optional<std::size_t> layerCount;
     std::vector<LayerPatch> layers;
 };
@@ -308,6 +310,9 @@ FilePatch parsePatch(const std::string& path)
             patch.loopInput = reader.boolean("LOOP value");
         } else if (directive == "INPUT_INDEX") {
             patch.inputIndex = reader.size("INPUT_INDEX value");
+        } else if (directive == "STEP_COUNT") {
+            patch.stepCount = static_cast<std::uint64_t>(
+                reader.size("STEP_COUNT value"));
         } else if (directive == "LAYERS") {
             patch.layerCount = reader.size("layer count");
             patch.layers.resize(*patch.layerCount);
@@ -530,6 +535,34 @@ void validateLearning(const OnlineEMOptions& learning)
 
 } // namespace
 
+Eigen::MatrixXd makeRandomPredictions(
+    Eigen::Index generatorCount,
+    Eigen::Index channelCount,
+    double betaShapeA,
+    double betaShapeB,
+    std::uint64_t seed)
+{
+    return randomPredictions(
+        generatorCount,
+        channelCount,
+        BetaSpecification{betaShapeA, betaShapeB, seed});
+}
+
+std::vector<Eigen::MatrixXd> makeRandomFilters(
+    Eigen::Index generatorCount,
+    Eigen::Index channelCount,
+    Eigen::Index contextOrder,
+    double betaShapeA,
+    double betaShapeB,
+    std::uint64_t seed)
+{
+    return randomFilters(
+        generatorCount,
+        channelCount,
+        contextOrder,
+        BetaSpecification{betaShapeA, betaShapeB, seed});
+}
+
 StateLoadResult loadModelState(
     const std::string& path,
     const ModelState* previous,
@@ -568,6 +601,17 @@ StateLoadResult loadModelState(
     } else {
         result.state.inputIndex = 0;
         warn(result.warnings, "INPUT_INDEX omitted; defaulted to zero");
+    }
+
+    if (patch.stepCount) {
+        result.state.stepCount = *patch.stepCount;
+    } else if (previous) {
+        result.state.stepCount = previous->stepCount;
+        warn(result.warnings,
+             "STEP_COUNT omitted; retained previous value");
+    } else {
+        result.state.stepCount = 0;
+        warn(result.warnings, "STEP_COUNT omitted; defaulted to zero");
     }
 
     const std::size_t inheritedLayerCount =
@@ -910,6 +954,130 @@ ModelState snapshotModelState(
     }
     validateModelState(snapshot);
     return snapshot;
+}
+
+
+void saveModelState(
+    const std::string& path,
+    const ModelState& state)
+{
+    validateModelState(state);
+
+    std::ofstream output(path);
+    if (!output) {
+        throw std::runtime_error(
+            "Could not open state file for writing: " + path);
+    }
+
+    output << std::setprecision(17);
+
+    auto writeBoolean = [&](bool value) {
+        output << (value ? 1 : 0);
+    };
+
+    auto writeMatrix = [&](const char* name, const Eigen::MatrixXd& matrix) {
+        output << name << " INLINE "
+               << matrix.rows() << ' ' << matrix.cols() << '\n';
+        for (Eigen::Index row = 0; row < matrix.rows(); ++row) {
+            for (Eigen::Index column = 0; column < matrix.cols(); ++column) {
+                if (column > 0) output << ' ';
+                output << matrix(row, column);
+            }
+            output << '\n';
+        }
+    };
+
+    auto rowVectorMatrix = [](const Eigen::VectorXd& vector) {
+        Eigen::MatrixXd matrix(1, vector.size());
+        if (vector.size() > 0) {
+            matrix.row(0) = vector.transpose();
+        }
+        return matrix;
+    };
+
+    auto parameterMatrix = [](const GeneratorParameters& parameters) {
+        const Eigen::Index K = parameters.baseRate.size();
+        Eigen::MatrixXd matrix(K, 4);
+        matrix.col(0) = parameters.baseRate;
+        matrix.col(1) = parameters.bottomUpWeight;
+        matrix.col(2) = parameters.evidenceAmplitude;
+        matrix.col(3) = parameters.centering;
+        return matrix;
+    };
+
+    auto flattenedFilters = [](const std::vector<Eigen::MatrixXd>& filters) {
+        if (filters.empty()) return Eigen::MatrixXd(0, 0);
+        const Eigen::Index K = static_cast<Eigen::Index>(filters.size());
+        const Eigen::Index N = filters.front().rows();
+        const Eigen::Index order = filters.front().cols();
+        Eigen::MatrixXd flattened(K * N, order);
+        for (Eigen::Index k = 0; k < K; ++k) {
+            flattened.middleRows(k * N, N) =
+                filters[static_cast<std::size_t>(k)];
+        }
+        return flattened;
+    };
+
+    output << "NOISY_OR_STATE 1\n\n";
+
+    writeMatrix("INPUT", state.input);
+    output << "LOOP ";
+    writeBoolean(state.loopInput);
+    output << "\n";
+    output << "INPUT_INDEX " << state.inputIndex << "\n";
+    output << "STEP_COUNT " << state.stepCount << "\n\n";
+
+    output << "LAYERS " << state.layers.size() << "\n\n";
+
+    for (std::size_t index = 0; index < state.layers.size(); ++index) {
+        const auto& layer = state.layers[index];
+        const auto& configuration = layer.configuration;
+        const Eigen::Index K = configuration.predictions.rows();
+        const Eigen::Index N = configuration.predictions.cols();
+        const Eigen::Index order = configuration.initialContext.cols();
+
+        output << "LAYER " << index << "\n";
+        output << "DIMENSIONS " << N << ' ' << K << ' ' << order << "\n";
+
+        writeMatrix("R", configuration.predictions);
+        writeMatrix("F", flattenedFilters(configuration.filters));
+        writeMatrix("LEAK", rowVectorMatrix(configuration.leak));
+        writeMatrix("PARAMETERS", parameterMatrix(configuration.parameters));
+        writeMatrix("CONTEXT", configuration.initialContext);
+
+        const Eigen::VectorXd topDownToSave =
+            layer.initialTopDownSupport.size() == 0
+                ? Eigen::VectorXd::Zero(K)
+                : layer.initialTopDownSupport;
+        writeMatrix("TOP_DOWN", rowVectorMatrix(topDownToSave));
+
+        const auto& selection = configuration.candidateSelection;
+        output << "CANDIDATE_SELECTION\n"
+               << selection.contextThreshold << ' '
+               << selection.topDownThreshold << ' '
+               << selection.observationThreshold << ' '
+               << selection.activationThreshold << ' ';
+        writeBoolean(selection.useActivationSupport);
+        output << ' ' << selection.maximumSelectedGenerators << "\n";
+
+        const auto& learning = layer.learning;
+        output << "EM\n";
+        writeBoolean(layer.learningEnabled);
+        output << ' '
+               << learning.predictionLearningRate << ' '
+               << learning.filterLearningRate << ' '
+               << learning.baseRateLearningRate << ' '
+               << learning.epsilon << ' ';
+        writeBoolean(learning.binarizeObservation);
+        output << ' ' << learning.observationThreshold << "\n";
+
+        output << "END_LAYER\n\n";
+    }
+
+    if (!output) {
+        throw std::runtime_error(
+            "Failed while writing state file: " + path);
+    }
 }
 
 bool readNextInput(ModelState& state, Eigen::VectorXd& observation)
