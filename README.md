@@ -1,7 +1,120 @@
 # Online Hierarchical Bayesian Model for Musical Structure Perception
 
 This is an ongoing research implementation of a hierarchical latent-variable Noisy-OR statistical model for online processing of sequential multivariate data. The code is being developed alongside the theoretical model and experimental work. This repository contains a working prototype as part of my reasearch on computational modelling of musical structure perception. At its core, the system is an online bayesian inference model. It ingests a multivariate time series one timestep at a time, learns sparse latent generators that act as local temporal predictors, and uses combinations of these generators to reconstruct the current observation and predict future structure. The code is written as a self-contained C++ library using Eigen, with a JUCE-based interface and logging/state-tracing tools for inspecting the model during experimental runs.
+## State, Tracing, and Logging System
 
+The implementation includes a state and tracing system designed to make model runs reproducible, inspectable, and shareable. This is important because the model is online: its behaviour at any timestep depends not only on the learned parameters, but also on the current context windows, activation priors, input position, and timestep counter.
+
+---
+
+###### **`.state` Files**
+
+Model configurations and checkpoints are stored using human-readable `.state` files. A `.state` file describes the current model state, including:
+
+- the input sequence,
+- whether the input loops,
+- the current input index,
+- the global timestep counter,
+- the number of layers,
+- each layer’s dimensions,
+- prediction matrices `R`,
+- temporal filters `F`,
+- leak probabilities,
+- generator parameters,
+- candidate-selection settings,
+- online EM learning settings,
+- context windows,
+- initial top-down support.
+
+A saved `.state` file is intended to be a self-contained checkpoint. Loading it reconstructs the model, including learned parameters and temporal context, so that a run can be resumed or reproduced from that point.
+
+The state loader also supports partial state descriptions. If a field is omitted and a compatible previous model exists, the loader can preserve the existing value. Otherwise, it falls back to documented defaults. This makes `.state` files useful both as full checkpoints and as lightweight experimental configuration files.
+
+The timestep counter is part of the state. It therefore persists across saves and loads, can be reset manually in the interface, and continues to advance during both ordinary GUI stepping and offline `Fast N` runs.
+
+---
+
+###### **Interactive State Display**
+
+The JUCE interface provides a live view of the current model state. It displays the input window and, for each layer, the main quantities involved in inference and learning:
+
+- `R`: generator prediction vectors,
+- `F`: temporal filters,
+- generator parameters such as base rate, weight, amplitude, and centering,
+- top-down prior support, when present,
+- inherited/current-step alpha,
+- next-step alpha,
+- filter match `qF`,
+- posterior marginal activation `mu`,
+- reconstruction,
+- selected generators,
+- candidate count,
+- log evidence,
+- online EM diagnostics,
+- `R` and `F` learning deltas.
+
+Most of these quantities are shown as grayscale matrices or vectors, so the interface can be used as a live diagnostic tool. Several parameters can also be edited directly from the GUI, allowing interactive experimentation while the model is running.
+
+---
+
+###### **JSONL Step Logging**
+
+The model can also write a detailed run log in JSONL format. Logging only occurs when the `Log` checkbox is enabled. If logging is not enabled, no step records are written.
+
+When logging starts, the application creates or appends to the current `.jsonl` log file. The logging controls allow the current file to be renamed, cleared, or reused. A typical log contains:
+
+1. a metadata record,
+2. an initial full-precision state snapshot,
+3. one JSON object per model step,
+4. a final full-precision state snapshot when logging stops.
+
+Each step record includes the timestep, input row, observation vector, and per-layer diagnostic quantities such as:
+
+- log evidence,
+- candidate count,
+- selected generators,
+- top-down prior,
+- inherited alpha,
+- next alpha,
+- `qF`,
+- `mu`,
+- reconstruction,
+- current `R`,
+- current `F`,
+- activation error,
+- base-rate delta,
+- `R_delta`,
+- `F_delta`.
+
+Step records use compact numeric formatting for readability, while state snapshots preserve full precision. This means the log can be used both for qualitative inspection and for later reconstruction of the initial or final model state.
+
+---
+
+###### **Trace Plotter**
+
+The trace plotter provides a time-series view of a JSONL run. It can load a log file and automatically discover the numeric fields available in the data. The user can choose which variables to display using a hierarchical checkbox list.
+
+Scalar fields are plotted as one-cell time slices. Vector fields are plotted as vertical stacks of grayscale cells. Matrix-valued fields, such as `R`, `F`, `R_delta`, and `F_delta`, are unpacked into vector traces so that they can be inspected over time.
+
+The trace plotter also supports exporting only the checked fields. This makes it possible to produce smaller analysis files containing only the quantities relevant to a particular question. These filtered logs can then be shared for later inspection without including the full diagnostic record.
+
+When a log contains an initial state snapshot, the trace plotter can also export it as a `.state` file. This allows a run to be restarted from the same initial condition, for example to test different candidate thresholds or learning rates.
+
+---
+
+###### **Experimental Workflow**
+
+A typical experimental workflow is:
+
+1. Load or create a `.state` file.
+2. Run the model interactively or with `Fast N`.
+3. Enable logging to record the run.
+4. Inspect the live layer display during learning.
+5. Open the trace plotter to inspect the logged time series.
+6. Export checked fields for focused analysis.
+7. Save the starting `.state` if the run should be reproduced with altered parameters.
+
+This system is intended to support close inspection of the model’s learning dynamics. In particular, it makes it possible to examine when generators enter the candidate set, how posterior responsibility is assigned, how `R` and `F` change over time, and how top-down support affects lower-layer inference.
 ## Mathematical Model
 
 We take as input a time-discrete multivariate process
