@@ -17,10 +17,14 @@ To run the model:
 - Inspect the live layer display during learning, and/or enable logging to record the run, using the trace plotter to inspect a logged time series.
   
 ____
-
-Below is a detailed description of the statistical model the code implements.
-
 ## Mathematical Model
+
+Below is a brief, high-level description of the statistical model the code implements, followed by a more detailed mathematical formulation.
+
+In short, each layer learns a set of latent generators which act as sparse local temporal predictors. These generators form a representation used for interence and prediction: the model interprets the current observation as a composition of generators, and gives a prediction for the next timestep.
+
+
+### Input
 
 We take as input a time-discrete multivariate process, ingested sequentially.
 
@@ -29,9 +33,8 @@ X := (X_t)_{t \in \mathbb{N}},
 \qquad
 X_t \in [0,1]^n.
 ```
-Each component $X_{t,i}$ represents the presence or intensity of an event in channel $i$.
+Each component $X_{t,i}$ represents the presence or "intensity" of an event in channel $i$.
 
-The model is a hierarchical online Bayesian latent-variable model. Each layer learns a set of latent generators which act as sparse local temporal predictors. These generators infer which latent causes are currently active, reconstruct the current observation, and prepare a prediction/prior for the next timestep.
 
 ---
 
