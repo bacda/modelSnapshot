@@ -23,7 +23,16 @@ What follows is a brief, high-level description of the statistical model the cod
 
 ### Summary of Mathematical Model
 
-The input state for each layer at time $t$ is formed by the observation vector $x^l_t$, and a context matrix $C$.
+The input state for each layer at time $t$ is formed by the current observation vector $x^l_t$, and a context matrix $C$ of some order $o$. The context matrix is
+
+```math
+C^l_t =
+\begin{bmatrix}
+\mathbf{x}^l_{t-1} & \mathbf{x}^l_{t-2} & \cdots & \mathbf{x}^l_{t-o_l}
+\end{bmatrix}
+\in [0,1]^{N_l \times o_l}.
+```
+
 
 Each layer contains a set of 'generators' $G$ which represent learned sparse local temporal regularities over its input, and infers its structure as a composition of these regularities. 
 
