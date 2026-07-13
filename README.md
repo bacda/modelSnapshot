@@ -25,7 +25,7 @@ What follows is a brief, high-level description of the statistical model the cod
 
 Each layer contains a set of 'generators' which represent learned sparse local temporal regularities over its input, and infers its structure as a composition of these regularities.
 
-Generators at one layer are represented as channels at the layer above, such that the sequence of generator activations as a causal explanation for its layers input forms the input for the layer above.
+Generators at one layer are represented as channels at the layer above, such that the sequence of generator activations inferred as a causal explanation for the current layer's input forms the input for the layer above.
 
 As a whole, the set of generators forms a representation used for interence and prediction: the model interprets the current observation as a composition of generator patterns, and gives a corresponding prediction for the next timestep.
 
