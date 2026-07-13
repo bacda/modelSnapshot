@@ -23,8 +23,15 @@ What follows is a brief, high-level description of the statistical model the cod
 
 ### Summary of Mathematical Model
 
-The input state for each layer at time $t$ is formed by the current observation vector $x^l_t$, and a context matrix $C$ of some order $o$. The context matrix is
+Each layer tracks a time-discrete multivariate random process, ingested sequentially.
 
+```math
+X := (X_t)_{t \in \mathbb{N}},
+\qquad
+X_t \in [0,1]^n.
+```
+
+At time $t$, a layer's input stateis formed by the current observation vector $x^l_t$, and a context matrix $C$ of some order $o$: 
 ```math
 C^l_t =
 \begin{bmatrix}
