@@ -4,7 +4,7 @@ This repo contains a working prototype of an online bayesian inference model as 
 
 The code is being developed alongside a theoretical model and corresponding experimental work, and is written as a self-contained C++ library using Eigen, with a JUCE-based interface and logging/state-tracing tools built on top to facilitate experimentation.
 
-###### **How to use**
+###### How to use:
 
 This implementation includes a state and tracing system designed for flexible experimentation. It makes runs reproducible, editable, inspectable, and shareable:
 - Model configurations and checkpoints are stored using `.state` files, which describe the current model state and are intended as self-contained checkpoints. Loading a `.state` file reconstructs the corresponding model state, including learned parameters and temporal context, so that a run can be resumed or reproduced from that point. The state loader also supports partial state descriptions, such that a `.state` file specifying, for example, only the input data or only the generator parameters, overwrites the corresponding fields in current state with those specifications.
