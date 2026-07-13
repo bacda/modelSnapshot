@@ -14,64 +14,11 @@ To run the model:
 
 - Load a `.state` file, or edit an existing pre-loaded one.
 - Run the model interactively (step-wise) or choose a number of steps and run asynchronously with `Fast N`.
-- Inspect the live layer display during learning, and/or enable logging to record the run, using the trace plotter to inspect a logged time series. 
+- Inspect the live layer display during learning, and/or enable logging to record the run, using the trace plotter to inspect a logged time series.
+  
+____
 
-###### **`.state` Files**
-
-Configurations/checkpoints are stored using `.state` files, which describe the current model state and are intended as self-contained descriptions. Loading a `.state` file reconstructs the corresponding model state, including learned parameters and temporal context, so a run can be resumed or reproduced from that point. 
-
-The state loader also supports partial state descriptions, such that a `.state` file specifying, for example, only the input data, or only the generator parameters, overwrites the corresponding fields in current state with those specifications, leaving other fields untouched. 
-
-###### **GUI**
-
-The JUCE interface provides a live view of the current model state so the interface can be used as a live diagnostic tool. It displays the input window and, for each layer, the main quantities involved in inference and learning. Most of these quantities are shown as grayscale matrices or vector, and several parameters can also be edited directly from the GUI, allowing interactive experimentation while the model is running.
-
-- `R`: generator prediction vectors,
-- `F`: temporal filters,
-- top-down prior signal,
-- inherited/current-step activation vector,
-- next-step activation vector,
-- filter match `qF`,
-- posterior marginal activation `mu`,
-- reconstruction,
-- selected generators,
-- candidate count,
-- log evidence,
-- online EM diagnostics,
-- `R` and `F` learning deltas.
-
-Most of these quantities are shown as grayscale matrices or vectors, so the interface can be used as a live diagnostic tool. Several parameters can also be edited directly from the GUI, allowing interactive experimentation while the model is running.
-
-###### Step Logging
-
-The model can also write a detailed run log in JSONL format.
-
-When logging starts, the application creates or appends to the current `.jsonl` log file. The logging controls allow the current file to be renamed, cleared, or reused. A typical log contains:
-
-1. a metadata record,
-2. an initial full-precision state snapshot,
-3. one JSON object per model step,
-4. a final full-precision state snapshot when logging stops.
-
-Each step record includes the timestep, input row, observation vector, and various per-layer diagnostic quantities.
-
-The can be used both for qualitative inspection and for later reconstruction of the initial or final model state.
-
----
-
-###### **Trace Plotter**
-
-The trace plotter provides a time-series view of a JSONL run. It can load a log file and automatically discover the numeric fields available in the data. The user can choose which variables to display using a hierarchical checkbox list.
-
-Scalar fields are plotted as one-cell time slices. Vector fields are plotted as vertical stacks of grayscale cells. Matrix-valued fields, such as `R`, `F`, `R_delta`, and `F_delta`, are unpacked into vector traces so that they can be inspected over time.
-
-The trace plotter also supports exporting only the checked fields. This makes it possible to produce smaller analysis files containing only the quantities relevant to a particular question. These filtered logs can then be shared for later inspection without including the full diagnostic record.
-
-When a log contains an initial state snapshot, the trace plotter can also export it as a `.state` file. This allows a run to be restarted from the same initial condition, for example to test different candidate thresholds or learning rates.
-
----
-
-
+Below is a detailed description of the statistical model the code implements.
 
 ## Mathematical Model
 
