@@ -31,15 +31,9 @@ X := (X_t)_{t \in \mathbb{N}},
 X_t \in [0,1]^n.
 ```
 
-At time $t$, a layer's input state is the current observation vector $x^l_t$, and a context matrix $C$ of some order $o$: 
-```math
-x^l_t = ...\\
-C^l_t =
-\begin{bmatrix}
-\mathbf{x}^l_{t-1} & \mathbf{x}^l_{t-2} & \cdots & \mathbf{x}^l_{t-o_l}
-\end{bmatrix}
-\in [0,1]^{N_l \times o_l}.
-```
+At time $t$, the input to layer $l$ consists of the current observation vector $\mathbf{x}^l_t \in [0,1]^{N_l}$ and an order-$o_l$ context matrix
+$C^l_t = [,\mathbf{x}^l_{t-1};\mathbf{x}^l_{t-2};\cdots;\mathbf{x}^l_{t-o_l},] \in [0,1]^{N_l \times o_l}$,
+whose columns contain the previous $o_l$ observation vectors.
 
 
 Each layer contains a set of 'generators' $G$ which represent learned sparse local temporal regularities over its input, and infers its structure as a composition of these regularities. 
