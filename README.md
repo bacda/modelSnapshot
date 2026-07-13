@@ -4,17 +4,17 @@ This repository contains a working prototype of an online bayesian inference mod
 
 The code is being developed alongside a theoretical model and corresponding experimental work, and is written as a self-contained C++ library using Eigen, with a JUCE-based interface and logging/state-tracing tools built on top to facilitate experimentation.
 
-## State, tracing, and logging infrastructure
+###### **How to use**
 
 This implementation includes a state and tracing system designed for flexible experimentation. It makes runs reproducible, editable, inspectable, and shareable:
 - Model configurations and checkpoints are stored using `.state` files, which describe the current model state and are intended as self-contained checkpoints. Loading a `.state` file reconstructs the corresponding model state, including learned parameters and temporal context, so that a run can be resumed or reproduced from that point. The state loader also supports partial state descriptions, such that a `.state` file specifying, for example, only the input data or only the generator parameters, overwrites the corresponding fields in current state with those specifications.
 - The interface provides a live view of the current model state so the interface can be used as a live diagnostic tool. It displays the input window and, for each layer, the main quantities involved in inference and learning. Most of these quantities are shown as grayscale matrices or vector, and several parameters can also be edited directly from the GUI, allowing interactive experimentation while the model is running.  
 
-###### **How to use**
+To run the model:
 
 - Load a `.state` file, or edit an existing pre-loaded one.
 - Run the model interactively (step-wise) or choose a number of steps and run asynchronously with `Fast N`.
-- Enable logging to record the run, use the trace plotter to inspect the logged time series, or inspect the live layer display during learning.
+- Inspect the live layer display during learning, and/or enable logging to record the run, using the trace plotter to inspect a logged time series. 
 
 ###### **`.state` Files**
 
