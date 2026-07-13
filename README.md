@@ -4,7 +4,7 @@ This repository contains a working prototype of an online bayesian inference mod
 
 In essence, the model is a hierarchical latent-variable Noisy-OR statistical model for online processing of sequential multivariate data, developed theoretically following predictive-processing principles. It ingests a multivariate time series incrementally (one step at a time), learns a set of sparse latent "generators" acting as temporal predictors, and uses combinations of these generators to reconstruct the current observation and predict future structure.
 
-## State, Tracing, and Logging System
+## State, Tracing, and Logging infrastructure
 
 The implementation includes a state and tracing system designed to make model runs reproducible, inspectable, and shareable.
 
