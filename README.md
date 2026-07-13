@@ -6,7 +6,9 @@ In essence, the model is a hierarchical latent-variable Noisy-OR statistical mod
 
 ## State, tracing, and logging infrastructure
 
-This implementation includes a state and tracing system designed for experimentation. It makes runs reproducible, editable, inspectable, and shareable.
+This implementation includes a state and tracing system designed for flexible experimentation. It makes runs reproducible, editable, inspectable, and shareable:
+- Model configurations and checkpoints are stored using `.state` files, which describe the current model state and are intended as self-contained checkpoints. Loading a `.state` file reconstructs the corresponding model state, including learned parameters and temporal context, so that a run can be resumed or reproduced from that point. The state loader also supports partial state descriptions, such that a `.state` file specifying, for example, only the input data or only the generator parameters, overwrites the corresponding fields in current state with those specifications.
+- The interface provides a live view of the current model state so the interface can be used as a live diagnostic tool. It displays the input window and, for each layer, the main quantities involved in inference and learning. Most of these quantities are shown as grayscale matrices or vector, and several parameters can also be edited directly from the GUI, allowing interactive experimentation while the model is running.  
 
 ###### **How to use**
 
@@ -22,7 +24,7 @@ Model configurations and checkpoints are stored using `.state` files, which desc
 
 ###### **GUI**
 
-The JUCE interface provides a live view of the current model state. It displays the input window and, for each layer, the main quantities involved in inference and learning:
+The JUCE interface provides a live view of the current model state so the interface can be used as a live diagnostic tool. It displays the input window and, for each layer, the main quantities involved in inference and learning. Most of these quantities are shown as grayscale matrices or vector, and several parameters can also be edited directly from the GUI, allowing interactive experimentation while the model is running.
 
 - `R`: generator prediction vectors,
 - `F`: temporal filters,
