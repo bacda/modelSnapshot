@@ -12,7 +12,7 @@ The implementation includes a state and tracing system designed to make model ru
 
 Model configurations and checkpoints are stored using `.state` files, which describe the current model state and are intended as self-contained checkpoints. Loading a `.state` file reconstructs the model, including learned parameters and temporal context, so that a run can be resumed or reproduced from that point. The state loader also supports partial state descriptions.
 
-###### **Interactive State Display**
+###### **GUI**
 
 The JUCE interface provides a live view of the current model state. It displays the input window and, for each layer, the main quantities involved in inference and learning:
 
@@ -32,7 +32,7 @@ The JUCE interface provides a live view of the current model state. It displays 
 
 Most of these quantities are shown as grayscale matrices or vectors, so the interface can be used as a live diagnostic tool. Several parameters can also be edited directly from the GUI, allowing interactive experimentation while the model is running.
 
-###### **JSONL Step Logging**
+###### Step Logging
 
 The model can also write a detailed run log in JSONL format.
 
