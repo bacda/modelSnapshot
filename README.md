@@ -21,9 +21,9 @@ ____
 
 What follows is a brief, high-level description of the statistical model the code implements. Below it, a more detailed mathematical formulation.
 
-## Summary of Mathematical Model
+### Summary of Mathematical Model
 
-### Input
+#### Input
 Each layer tracks a time-discrete multivariate random process, ingested sequentially.
 
 ```math
@@ -31,12 +31,12 @@ X := (X_t)_{t \in \mathbb{N}},
 \qquad
 X_t \in [0,1]^n.
 ```
-### Input State
+#### Input State
 At time $t$, the input to layer $l$ consists of the current observation vector $\mathbf{x}^l_t \in [0,1]^{N_l}$ and an order-$o_l$ context matrix
 $C^l_t = [,\mathbf{x}^l_{t-1};\mathbf{x}^l_{t-2};\cdots;\mathbf{x}^l_{t-o_l},] \in [0,1]^{N_l \times o_l}$,
 whose columns contain the previous $o_l$ observation vectors.
 
-### Generators
+#### Generators
 Each layer contains a set of 'generators' $G$ which represent learned sparse local temporal regularities over its input, and infers its structure as a composition of these regularities. 
 
 Generators are parameterised by a pair $(F^{l+1}_k,r^{l+1}_k)$ where $F$ is an order- $o$ kernel $F_k^{l+1} \in \mathbb{R}^{n_l\times o}$, which is matched with $C$ to detects a specific activation pattern in the lag-space of $l$ , and a prediction vector $r^{l+1}_k$ which predicts activations at level $l$.
