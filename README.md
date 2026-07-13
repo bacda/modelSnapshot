@@ -20,7 +20,7 @@ This implementation includes a state and tracing system designed for flexible ex
 
 ###### **`.state` Files**
 
-Model configurations and checkpoints are stored using `.state` files, which describe the current model state and are intended as self-contained checkpoints. Loading a `.state` file reconstructs the corresponding model state, including learned parameters and temporal context, so that a run can be resumed or reproduced from that point. The state loader also supports partial state descriptions, such that a `.state` file specifying, for example, only the input data or only the generator parameters, overwrites the corresponding fields in current state with those specifications. 
+Configurations/checkpoints are stored using `.state` files, which describe the current model state and are intended as self-contained checkpoints. Loading a `.state` file reconstructs the corresponding model state, including learned parameters and temporal context, so that a run can be resumed or reproduced from that point. The state loader also supports partial state descriptions, such that a `.state` file specifying, for example, only the input data or only the generator parameters, overwrites the corresponding fields in current state with those specifications. 
 
 ###### **GUI**
 
