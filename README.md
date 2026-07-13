@@ -15,8 +15,6 @@ This implementation includes a state and tracing system designed for flexible ex
 - Load a `.state` file, or edit an existing pre-loaded one.
 - Run the model interactively (step-wise) or choose a number of steps and run asynchronously with `Fast N`.
 - Enable logging to record the run, use the trace plotter to inspect the logged time series, or inspect the live layer display during learning.
-- Export checked fields for focused analysis.
-- Save the starting `.state` if the run should be reproduced with altered parameters.
 
 ###### **`.state` Files**
 
