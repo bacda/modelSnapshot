@@ -33,7 +33,7 @@ Generators at one layer are represented as channels at the layer above, such tha
 As a whole, the set of generators forms a representation used for interence and prediction: the model interprets the current observation as a composition of generator patterns, and gives a corresponding prediction for the next timestep.
 
 
-| layer | state                                                  | generators $G_k^l​=(F_k^l​,r_k^l)$                               | downward prior $\tau^i$                            |     |
+| layer | input state                                                  | generators $G_k^l​=(F_k^l​,r_k^l)$                               | downward prior $\tau^i$                            |     |
 | ----- | ------------------------------------------------------ | ---------------------------------------------------------------- | -------------------------------------------------- | --- |
 | $l_2$ | $\mathbf{x}_t^2​\in[0,1]^{K_2}​, C_t^2​\in[0,1]^{K_2}$ | $F^2_k \in \mathbb{R}^{K_1 \times o}\quad r^2_k \in [0,1]^{K_1}$ | $\tau^2_{t,k} = f(\mathbf{x}_t^2) \in [0,1]^{K_1}$ |     |
 | $l_1$ | $\mathbf{x}_t^1​\in[0,1]^{K_1}​,C_t^1​\in[0,1]^{K_1}$  | $F^1_k \in \mathbb{R}^{n_0 \times o}\quad r^1_k \in [0,1]^{n_0}$ | $\tau^1_{t,k} = f(\mathbf{x}_t^1) \in [0,1]^{n_0}$ |     |
