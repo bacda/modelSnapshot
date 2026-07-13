@@ -25,7 +25,7 @@ What follows is a brief, high-level description of the statistical model the cod
 
 Each layer contains a set of 'generators' $G$ which represent learned sparse local temporal regularities over its input, and infers its structure as a composition of these regularities. 
 
-We have an existing learned set of generators per hierarchical level. They are parameterised by a pair $(F^{l+1}_k,r^{l+1}_k)$ where $F$ is an order-$o$ filter $F_k^{l+1} \in \mathbb{R}^{n_l\times o}$, which detects a specific activation pattern in the lag-space of $l$ , and a prediction vector $r^{l+1}_k$ which predicts activations at level $l$.
+We have an existing learned set of generators per hierarchical level. They are parameterised by a pair $(F^{l+1}_k,r^{l+1}_k)$ where $F$ is an order- $o$ kernel $F_k^{l+1} \in \mathbb{R}^{n_l\times o}$, which detects a specific activation pattern in the lag-space of $l$ , and a prediction vector $r^{l+1}_k$ which predicts activations at level $l$.
 
 
 Generators at one layer are represented as channels at the layer above, such that the sequence of generator activations inferred as a causal explanation for the current layer's input forms the input for the layer above.
