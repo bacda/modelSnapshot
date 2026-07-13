@@ -33,14 +33,10 @@ X := (X_t)_{t \in \mathbb{N}},
 \qquad
 X_t \in [0,1]^n.
 ```
-Each component $X_{t,i}$ represents the presence or "intensity" of an event in channel $i$.
+At the sensory (input) layer, each element $X^0_{t,i}$ represents the presence and "intensity"/amplitude of an event in channel $i$.
+In layers above it, elements $X^{l>0}_{t,i}$ represents the inferred probability that a generator's produced events at the layer below.
 
-
----
-
-###### **Layers and Generators**
-
-At layer $l$, the observation vector is
+More speficially, At layer $l$, the observation vector is
 
 ```math
 \mathbf{x}^l_t \in [0,1]^{N_l}.
@@ -59,6 +55,13 @@ N_{l+1} = K_l,
 ```
 
 where $K_l$ is the number of generators in layer $l$.
+
+
+---
+
+###### **Layers and Generators**
+
+
 
 Each generator $k$ in layer $l$ has:
 
