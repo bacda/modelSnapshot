@@ -3,11 +3,11 @@
 This is an ongoing research implementation of a hierarchical latent-variable Noisy-OR statistical model for online processing of sequential multivariate data. The code is being developed alongside the theoretical model and experimental work. This repository contains a working prototype as part of my reasearch on computational modelling of musical structure perception. At its core, the system is an online bayesian inference model. It ingests a multivariate time series one timestep at a time, learns sparse latent generators that act as local temporal predictors, and uses combinations of these generators to reconstruct the current observation and predict future structure. The code is written as a self-contained C++ library using Eigen, with a JUCE-based interface and logging/state-tracing tools for inspecting the model during experimental runs.
 ## State, Tracing, and Logging System
 
-The implementation includes a state and tracing system designed to make model runs reproducible, inspectable, and shareable. This is important because the model is online: its behaviour at any timestep depends not only on the learned parameters, but also on the current context windows, activation priors, input position, and timestep counter.
+The implementation includes a state and tracing system designed to make model runs reproducible, inspectable, and shareable.
 
 ###### **`.state` Files**
 
-Model configurations and checkpoints are stored using human-readable `.state` files. A `.state` file describes the current model state and is intended as a self-contained checkpoint: Loading it reconstructs the model, including learned parameters and temporal context, so that a run can be resumed or reproduced from that point. The state loader also supports partial state descriptions.
+Model configurations and checkpoints are stored using `.state` files, which describe the current model state and are intended as self-contained checkpoints. Loading a `.state` file reconstructs the model, including learned parameters and temporal context, so that a run can be resumed or reproduced from that point. The state loader also supports partial state descriptions.
 
 ###### **Interactive State Display**
 
