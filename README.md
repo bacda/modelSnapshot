@@ -1,6 +1,6 @@
 # Streaming Hierarchical Bayesian Model for Musical Structure Inference
 
-This repository contains a working prototype of an online bayesian inference model as part of my reasearch on computational modelling of musical structure perception. The code is being developed alongside a theoretical model and corresponding experimental work, and is written as a self-contained C++ library using Eigen. Additionally, a JUCE-based interface and logging/state-tracing tools enable flexible experimentation 
+This repository contains a working prototype of an online bayesian inference model as part of my reasearch on computational modelling of musical structure perception. The code is being developed alongside a theoretical model and corresponding experimental work, and is written as a self-contained C++ library using Eigen. Additionally, a JUCE-based interface and logging/state-tracing tools enable experimentation, making runs reproducible, editable, inspectable, and shareable:
 
 In essence, the model is a hierarchical latent-variable Noisy-OR statistical model for online processing of sequential multivariate data, developed theoretically following predictive-processing principles. It ingests a multivariate time series incrementally (one step at a time), learns a set of sparse latent "generators" acting as temporal predictors, and uses combinations of these generators to reconstruct the current observation and predict future structure.
 
