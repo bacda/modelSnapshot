@@ -23,11 +23,19 @@ What follows is a brief, high-level description of the statistical model the cod
 
 ### Summary of Mathematical Model
 
-Each layer learns a set of 'generators' which represent learned sparse local temporal regularities over its input, and infers its structure as a composition of these regularities.
+Each layer contains a set of 'generators' which represent learned sparse local temporal regularities over its input, and infers its structure as a composition of these regularities.
 
 Generators at one layer are represented as channels at the layer above, such that the sequence of generator activations as a causal explanation for its layers input forms the input for the layer above.
 
 As a whole, the set of generators forms a representation used for interence and prediction: the model interprets the current observation as a composition of generator patterns, and gives a corresponding prediction for the next timestep.
+
+
+| layer | state                                                  | generators $G_k^l​=(F_k^l​,r_k^l)$                               | downward prior $\tau^i$                            |     |
+| ----- | ------------------------------------------------------ | ---------------------------------------------------------------- | -------------------------------------------------- | --- |
+| $l_2$ | $\mathbf{x}_t^2​\in[0,1]^{K_2}​, C_t^2​\in[0,1]^{K_2}$ | $F^2_k \in \mathbb{R}^{K_1 \times o}\quad r^2_k \in [0,1]^{K_1}$ | $\tau^2_{t,k} = f(\mathbf{x}_t^2) \in [0,1]^{K_1}$ |     |
+| $l_1$ | $\mathbf{x}_t^1​\in[0,1]^{K_1}​,C_t^1​\in[0,1]^{K_1}$  | $F^1_k \in \mathbb{R}^{n_0 \times o}\quad r^1_k \in [0,1]^{n_0}$ | $\tau^1_{t,k} = f(\mathbf{x}_t^1) \in [0,1]^{n_0}$ |     |
+| $l_0$ | $\mathbf{x}_t^0​\in\{0,1\}^{n_0}​$                     | –                                                                | –                                                  |     |
+
 
 
 ### Input
