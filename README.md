@@ -19,8 +19,9 @@ To run the model:
 ____
 ## Mathematical Model
 
-Below is a brief, high-level description of the statistical model the code implements, followed by a more detailed mathematical formulation.
+What follows is a brief, high-level description of the statistical model the code implements. Below it, a more detailed mathematical formulation.
 
+### Summary of Mathematical Model
 In short, each layer learns a set of latent generators which act as sparse local temporal predictors. These generators form a representation used for interence and prediction: the model interprets the current observation as a composition of generators, and gives a prediction for the next timestep.
 
 
