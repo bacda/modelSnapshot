@@ -6,7 +6,7 @@ In essence, the model is a hierarchical latent-variable Noisy-OR statistical mod
 
 ## State, tracing, and logging infrastructure
 
-The implementation includes a state and tracing system designed for experimentation. It makes runs reproducible, editable, inspectable, and shareable.
+This implementation includes a state and tracing system designed for experimentation. It makes runs reproducible, editable, inspectable, and shareable.
 
 ###### **How to use**
 
