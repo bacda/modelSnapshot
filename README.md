@@ -4,9 +4,9 @@ This repository contains a working prototype of an online bayesian inference mod
 
 In essence, the model is a hierarchical latent-variable Noisy-OR statistical model for online processing of sequential multivariate data, developed theoretically following predictive-processing principles. It ingests a multivariate time series incrementally (one step at a time), learns a set of sparse latent "generators" acting as temporal predictors, and uses combinations of these generators to reconstruct the current observation and predict future structure.
 
-## State, Tracing, and Logging infrastructure
+## State, tracing, and logging infrastructure
 
-The implementation includes a state and tracing system designed to make model runs reproducible, inspectable, and shareable.
+The implementation includes a state and tracing system designed for experimentation. It makes runs reproducible, editable, inspectable, and shareable.
 
 ###### **`.state` Files**
 
@@ -61,19 +61,14 @@ When a log contains an initial state snapshot, the trace plotter can also export
 
 ---
 
-###### **Experimental Workflow**
+###### **How to use**
 
-A typical experimental workflow is:
+- Load or create a `.state` file.
+- Run the model interactively (step-wise) or asynchronously with `Fast N`.
+- Enable logging to record the run, use the trace plotter to inspect the logged time series, or inspect the live layer display during learning.
+- Export checked fields for focused analysis.
+- Save the starting `.state` if the run should be reproduced with altered parameters.
 
-1. Load or create a `.state` file.
-2. Run the model interactively or with `Fast N`.
-3. Enable logging to record the run.
-4. Inspect the live layer display during learning.
-5. Open the trace plotter to inspect the logged time series.
-6. Export checked fields for focused analysis.
-7. Save the starting `.state` if the run should be reproduced with altered parameters.
-
-This system is intended to support close inspection of the model’s learning dynamics. In particular, it makes it possible to examine when generators enter the candidate set, how posterior responsibility is assigned, how `R` and `F` change over time, and how top-down support affects lower-layer inference.
 ## Mathematical Model
 
 We take as input a time-discrete multivariate process, ingested sequentially.
