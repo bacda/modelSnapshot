@@ -13,7 +13,7 @@ This implementation includes a state and tracing system designed for flexible ex
 To run the model:
 
 - Load a `.state` file, or edit an existing pre-loaded one.
-- Run the model interactively (step-wise) or choose a number of steps and run asynchronously with `Fast N`.
+- Run the model interactively (step-wise) or run asynchronously for a predefined number of steps.
 - Inspect the live layer display during learning, and/or enable logging to record the run, using the trace plotter to inspect a logged time series.
   
 ____
