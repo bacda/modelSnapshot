@@ -31,9 +31,9 @@ X := (X_t)_{t \in \mathbb{N}},
 X_t \in [0,1]^n.
 ```
 
-At time $t$, a layer's input stateis formed by the current observation vector $x^l_t$, and a context matrix $C$ of some order $o$: 
+At time $t$, a layer's input state is the current observation vector $x^l_t$, and a context matrix $C$ of some order $o$: 
 ```math
-x^l_t = ...
+x^l_t = ...\\
 C^l_t =
 \begin{bmatrix}
 \mathbf{x}^l_{t-1} & \mathbf{x}^l_{t-2} & \cdots & \mathbf{x}^l_{t-o_l}
