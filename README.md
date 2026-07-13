@@ -8,6 +8,14 @@ In essence, the model is a hierarchical latent-variable Noisy-OR statistical mod
 
 The implementation includes a state and tracing system designed for experimentation. It makes runs reproducible, editable, inspectable, and shareable.
 
+###### **How to use**
+
+- Load or create a `.state` file.
+- Run the model interactively (step-wise) or choose a number of steps and run asynchronously with `Fast N`.
+- Enable logging to record the run, use the trace plotter to inspect the logged time series, or inspect the live layer display during learning.
+- Export checked fields for focused analysis.
+- Save the starting `.state` if the run should be reproduced with altered parameters.
+
 ###### **`.state` Files**
 
 Model configurations and checkpoints are stored using `.state` files, which describe the current model state and are intended as self-contained checkpoints. Loading a `.state` file reconstructs the model, including learned parameters and temporal context, so that a run can be resumed or reproduced from that point. The state loader also supports partial state descriptions.
@@ -61,13 +69,7 @@ When a log contains an initial state snapshot, the trace plotter can also export
 
 ---
 
-###### **How to use**
 
-- Load or create a `.state` file.
-- Run the model interactively (step-wise) or asynchronously with `Fast N`.
-- Enable logging to record the run, use the trace plotter to inspect the logged time series, or inspect the live layer display during learning.
-- Export checked fields for focused analysis.
-- Save the starting `.state` if the run should be reproduced with altered parameters.
 
 ## Mathematical Model
 
