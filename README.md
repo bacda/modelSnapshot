@@ -38,9 +38,9 @@ Each layer contains a set of 'generators', denoted by $\mathbf{G}_k$ . Each gene
 
 - a **context detector** $F_k$ measures the presence of a characteristic pattern in the lagged context $C$;
 
-- a **prediction vector** $R_k$ specifies a subset of observation dimensions expected to become active in the next observation given the inferred presence of the context pattern measured by $F_k$
+- a **prediction vector** $R_k$ specifies a subset of observation dimensions in $x_t$ predicted to become active conditioned on the inferred presence of the context pattern measured by $F_k$
 
-The complete prediction of $x_t$ is not produced by a single generator. Instead, each active generator contributes a **partial prediction**, and the full prediction is obtained by composing the predictions of all inferred active generators via the Noisy-OR observation model.
+Thus, each active generator contributes a **partial prediction**, and the complete prediction of $x_t$ is not produced by a single generator, but is obtained by composing the predictions of all inferred active generators via a Noisy-OR observation model.
 
 Conceptually, a generator therefore represents a reusable partial mapping
 
