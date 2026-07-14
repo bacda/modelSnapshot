@@ -34,7 +34,7 @@ $C^l_t = [,\mathbf{x}^l_{t-1};\mathbf{x}^l_{t-2};\cdots;\mathbf{x}^l_{t-o_l},] \
 whose columns contain the previous $o_l$ observation vectors.
 
 #### Generators
-Each layer contains a set of 'generators', denoted by $G$. Each generator $g_k \in G$ represents a sparse local temporal regularity consisting of:
+Each layer contains a set of 'generators', denoted by $\mathbf{G}$ . Each generator $G \in \mathbf{G}$ represents a sparse local temporal regularity consisting of:
 
 - a **context detector** $F_k$, which measures the presence of a characteristic pattern in the lagged context $C$;
 
@@ -45,7 +45,7 @@ The complete prediction of $x_t$ is not produced by a single generator. Instead,
 Conceptually, a generator therefore represents a reusable partial mapping
 
 $$
-g_k : C \rightarrow \hat{x}^{(k)},
+G_k : C \rightarrow \hat{x}^{(k)},
 $$
 
 where $\hat{x}^{(k)}$ is a sparse prediction over the components of $x_t$. The complete prediction is
