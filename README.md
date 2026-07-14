@@ -29,7 +29,7 @@ X := (X_t)_{t \in \mathbb{N}},
 X_t \in [0,1]^n.
 ```
 #### Input State Space
-At a fixed time $t$ and layer $l$, the input state space consists of the current observation vector $\mathbf{x}^l_t \in [0,1]^{N_l}$ and an order-$o_l$ context matrix
+At a fixed time $t$ and layer $l$, the input state space consists of the current observation vector $\mathbf{x}^l_t \in [0,1]^{N_l}$ and an order- $o_l$ context matrix
 $C^l_t = [,\mathbf{x}^l_{t-1};\mathbf{x}^l_{t-2};\cdots;\mathbf{x}^l_{t-o_l},] \in [0,1]^{N_l \times o_l}$,
 whose columns contain the previous $o_l$ observation vectors.
 
