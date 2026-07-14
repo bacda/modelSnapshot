@@ -34,11 +34,11 @@ $C^l_t = [,\mathbf{x}^l_{t-1};\mathbf{x}^l_{t-2};\cdots;\mathbf{x}^l_{t-o_l},] \
 whose columns contain the previous $o_l$ observation vectors.
 
 #### Generators
-Each layer contains a set of 'generators', denoted by $\mathbf{G}_k$ . Each generator represents a sparse local temporal regularity represented as a pair $G_k^l​=(F_k^l​,r_k^l)$, where:
+Each layer contains a set of 'generators', denoted by $\mathbf{G}_k$ . Each generator represents a sparse local temporal regularity represented as a pair $G_k​=(F_k​,r_k)$, where:
 
-- a **context detector** $F_k$, which measures the presence of a characteristic pattern in the lagged context $C$;
+- a **context detector** $F_k$ measures the presence of a characteristic pattern in the lagged context $C$;
 
-- a **prediction vector** $R_k$, specifying the subset of observation dimensions expected to become active in the next observation.
+- a **prediction vector** $R_k$ specifies a subset of observation dimensions expected to become active in the next observation given the inferred presence of the context pattern measured by $F_k$
 
 The complete prediction of $x_t$ is not produced by a single generator. Instead, each active generator contributes a **partial prediction**, and the full prediction is obtained by composing the predictions of all inferred active generators via the Noisy-OR observation model.
 
