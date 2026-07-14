@@ -50,22 +50,11 @@ $$
 
 where $\hat{x}^{(k)}$ is a sparse prediction over the components of $x_t$. Given the inferred active generators $z_t$, the predicted observation is
 
-$$
-\hat{x}_t
-=
-1-
-\prod_{k:z_{t,k}=1}
-\left(1-R_k\right),
-$$
+$$\hat{x}_t=1-\prod_{k:z_{t,k}=1}\left(1-R_k\right),$$
 
 where the product is taken elementwise over the observation dimensions. In the deterministic binary limit, this reduces to
 
-$$
-\hat{x}_t
-=
-\bigvee_{k:z_{t,k}=1}
-R_k.
-$$
+$$\hat{x}_t=\bigvee_{k:z_{t,k}=1}R_k.$$
 
 Thus, rather than learning whole transitions $C \rightarrow x_t$, the model learns a dictionary of reusable local temporal regularities whose compositions explain and predict observations.
 
