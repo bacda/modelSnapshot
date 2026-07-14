@@ -34,7 +34,7 @@ $C^l_t = [,\mathbf{x}^l_{t-1};\mathbf{x}^l_{t-2};\cdots;\mathbf{x}^l_{t-o_l},] \
 whose columns contain the previous $o_l$ observation vectors.
 
 #### Generators
-Each layer contains a set of 'generators', denoted by $\mathbf{G}$ . Each generator $G \in \mathbf{G}$ represents a sparse local temporal regularity consisting of:
+Each layer contains a set of 'generators', denoted by $\mathbf{G}_k$ . Each generator represents a sparse local temporal regularity represented as a pair $G_k^l​=(F_k^l​,r_k^l)$, where:
 
 - a **context detector** $F_k$, which measures the presence of a characteristic pattern in the lagged context $C$;
 
