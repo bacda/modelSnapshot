@@ -25,7 +25,7 @@ What follows is a brief, high-level description of the statistical model the cod
 ### Summary of Mathematical Model
 
 #### Input
-Each layer tracks a time-discrete multivariate random process, ingested sequentially.
+Each layer's input is a time-discrete multivariate random process, ingested sequentially/incrementally/online.
 
 ```math
 X := (X_t)_{t \in \mathbb{N}},
