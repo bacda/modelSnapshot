@@ -20,10 +20,6 @@ To run the model:
 ____
 ## Mathematical Model
 
-What follows is a brief, high-level description of the statistical model the code implements. Below it, a more detailed mathematical formulation.
-
-### Summary of Mathematical Model
-
 #### Input
 Each layer's input is a time-discrete multivariate random process, ingested sequentially/incrementally.
 
@@ -33,12 +29,44 @@ X := (X_t)_{t \in \mathbb{N}},
 X_t \in [0,1]^n.
 ```
 #### Input State Space
-At time $t$ and layer $l$, the input state space consists of the current observation vector $\mathbf{x}^l_t \in [0,1]^{N_l}$ and an order-$o_l$ context matrix
+At a fixed time $t$ and layer $l$, the input state space consists of the current observation vector $\mathbf{x}^l_t \in [0,1]^{N_l}$ and an order-$o_l$ context matrix
 $C^l_t = [,\mathbf{x}^l_{t-1};\mathbf{x}^l_{t-2};\cdots;\mathbf{x}^l_{t-o_l},] \in [0,1]^{N_l \times o_l}$,
 whose columns contain the previous $o_l$ observation vectors.
 
 #### Generators
-Each layer contains a set of 'generators', denoted by $G$, which represent learned sparse local temporal regularities as functions from $C \to x_t$, and infers its structure as a composition of these regularities. 
+Each layer contains a set of 'generators', denoted by $G$. Each generator $g_k \in G$ represents a sparse local temporal regularity consisting of:
+
+- a **context detector** $F_k$, which measures the presence of a characteristic pattern in the lagged context $C$;
+
+- a **prediction vector** $R_k$, specifying the subset of observation dimensions expected to become active in the next observation.
+
+The complete prediction of $x_t$ is not produced by a single generator. Instead, each active generator contributes a **partial prediction**, and the full prediction is obtained by composing the predictions of all inferred active generators via the Noisy-OR observation model.
+
+Conceptually, a generator therefore represents a reusable partial mapping
+
+$$
+g_k : C \rightarrow \hat{x}^{(k)},
+$$
+
+where $\hat{x}^{(k)}$ is a sparse prediction over the components of $x_t$. The complete prediction is
+
+$$
+\hat{x}_t
+=
+\operatorname{NoisyOR}\!\left(
+\{\hat{x}^{(k)} : z_k = 1\}
+\right),
+$$
+
+which, in the deterministic binary limit, reduces to
+
+$$
+\hat{x}_t
+=
+\bigvee_{k : z_k = 1} R_k.
+$$
+
+Thus, rather than learning whole transitions $C \rightarrow x_t$, the model learns a dictionary of reusable local temporal regularities whose compositions explain and predict observations.
 
 Generators are parameterised by a pair $(F^{l+1}_k,r^{l+1}_k)$ where $F$ is an order- $o$ kernel $F_k^{l+1} \in \mathbb{R}^{n_l\times o}$, which is matched with $C$ to detects a specific activation pattern in the lag-space of $l$ , and a prediction vector $r^{l+1}_k$ which predicts activations at level $l$.
 
