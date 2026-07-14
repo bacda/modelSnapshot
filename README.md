@@ -51,8 +51,7 @@ $$
 where $\hat{x}^{(k)}$ is a sparse prediction over the components of $x_t$. The complete prediction is
 
 $$
-\hat{x}_t
-=
+\hat{x}_t=
 \mathrm{NoisyOR}
 \left(
 \{\hat{x}^{(k)} : z_k = 1\}
@@ -61,8 +60,7 @@ $$
 
 which, in the deterministic binary limit, reduces to
 
-$$
-\hat{x}_t
+$$\hat{x}_t
 =
 \bigvee_{k : z_k = 1} R_k.
 $$
