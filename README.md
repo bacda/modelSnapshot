@@ -45,13 +45,16 @@ Thus, each active generator contributes a **partial prediction**, and the comple
 Conceptually, a generator therefore represents a reusable partial mapping
 
 $$
-G_k : C \rightarrow \hat{x}^{(k)},
+g_k : C \rightarrow \hat{x}^{(k)},
 $$
 
 where $\hat{x}^{(k)}$ is a sparse prediction over the components of $x_t$. The complete prediction is
 
-$$\hat{x}_t=
-\operatorname{NoisyOR}\!\left(
+$$
+\hat{x}_t
+=
+\mathrm{NoisyOR}
+\left(
 \{\hat{x}^{(k)} : z_k = 1\}
 \right),
 $$
@@ -65,9 +68,6 @@ $$
 $$
 
 Thus, rather than learning whole transitions $C \rightarrow x_t$, the model learns a dictionary of reusable local temporal regularities whose compositions explain and predict observations.
-
-Generators are parameterised by a pair $(F^{l+1}_k,r^{l+1}_k)$ where $F$ is an order- $o$ kernel $F_k^{l+1} \in \mathbb{R}^{n_l\times o}$, which is matched with $C$ to detects a specific activation pattern in the lag-space of $l$ , and a prediction vector $r^{l+1}_k$ which predicts activations at level $l$.
-
 
 Generators at one layer are represented as channels at the layer above, such that the sequence of generator activations inferred as a causal explanation for the current layer's input forms the input for the layer above.
 
