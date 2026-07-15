@@ -19,15 +19,20 @@ To run the model:
 ____
 ## Mathematical Model
 
+#### Summary
+
+
 #### Input
 The input data to the model, referred to hereafter as the **sensory input**, is a time-discrete multivariate random process which ingested sequentially one time step at a time.
 
 ```math
 X := (X_t)_{t \in \mathbb{N}},
 \qquad
-X_t \in [0,1]^n.
+X_t \in [0,1]^n, 
 ```
-The sensory input is only observed by the bottom layer. Layers above the bottom layer likewise have input $X := (X_t)_{t \in \mathbb{N}}$
+Where
+
+The sensory input is only observed by the bottom layer. Layers above the bottom layer likewise have input $X := (X_t)_{t \in \mathbb{N}}$ which corresponds
 
 
 #### Input State Space
@@ -42,7 +47,10 @@ Each layer contains a set of 'generators'. Each generator $\mathbf{G}_k$  repres
 
 - a **prediction vector** $R_k$ specifies a subset of observation dimensions in $x_t$ predicted to become active conditioned on the inferred presence of the context pattern measured by $F_k$
 
-Thus, each active generator gives only a partial prediction over the observation vector's dimensions, based on the presence of a characteristic pattern inferred in context $C$
+Since $R_k$ has the same dimension as $x_t$ each generator formally maps $C \to \mathbb{R}^n. However, in general, each active generator effectively gives a partial prediction over a subset observation vector's dimensions, based on the presence of a characteristic pattern inferred in context $C$. 
+
+#### A factorial latent representation
+We introduce a binary hidden state $z_k$ representing the presence of the pattern encoded by $G_k$ as an active explanation for the current observation $x_t$. Since many generators can jointly explain $x_t$, the corresponding latent representation is factorial.
 
 
 #### Noisy-OR observation model
