@@ -1,7 +1,6 @@
 # Streaming Hierarchical Bayesian Model for Musical Structure Inference
 
-
-This repo contains a C++ implementation of an streaming/incremental/online bayesian inference model as part of my reasearch on computational modelling of musical structure perception. In essence, the model is a hierarchical latent-variable Noisy-OR statistical model for sequential processing of multivariate data, developed theoretically following predictive-processing principles. It ingests a (discrete-time) multivariate time series incrementally (one step at a time), learning a set of sparse latent "generators" acting as temporal (autoregressive) predictors, and uses combinations of these generators to reconstruct/interpret current observations and predict future observations.
+This repository contains a C++ implementation of a predictive processing bayesian inference model as part of my reasearch on computational modelling of musical structure perception. In essence, the model is a hierarchical latent-variable Noisy-OR statistical model for sequential processing of multivariate data, developed theoretically following predictive-processing principles. It ingests a (discrete-time) multivariate time series incrementally (one step at a time), learning along the way a set of sparse latent "generators" acting as temporal (autoregressive) predictors, and uses combinations of these generators to reconstruct/interpret current observations and predict future observations.
 
 The code is being developed alongside a theoretical model and corresponding experimental work, and is written as a self-contained C++ library using Eigen, with a JUCE-based interface and logging/state-tracing tools built on top to facilitate experimentation.
 
@@ -21,13 +20,19 @@ ____
 ## Mathematical Model
 
 #### Input
-Each layer's input is a time-discrete multivariate random process, ingested sequentially/incrementally.
+The input data to the model, referred to hereafter as the **sensory input** is a time-discrete multivariate random process which ingested sequentially one time step at a time.
 
 ```math
 X := (X_t)_{t \in \mathbb{N}},
 \qquad
 X_t \in [0,1]^n.
 ```
+
+Likewise, the input 
+At layers above the bottom one, the input is also 
+
+We refer to the input to the bottom layer as the sensory input,
+
 #### Input State Space
 At a fixed time $t$ and layer $l$, the input state space consists of the current observation vector $\mathbf{x}^l_t \in [0,1]^{N_l}$ and an order- $o_l$ context matrix
 $C^l_t = [,\mathbf{x}^l_{t-1};\mathbf{x}^l_{t-2};\cdots;\mathbf{x}^l_{t-o_l},] \in [0,1]^{N_l \times o_l}$,
