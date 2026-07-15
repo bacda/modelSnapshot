@@ -20,7 +20,7 @@ ____
 ## Mathematical Model
 
 #### Summary
-
+The model can be understood as a factorial hierarchical latent-variable model: At each layer, the latent representation consists of multiple simultaneously active binary generators with conditionally independent Bernoulli priors, whose predictions compose through a Noisy-OR emission model.
 
 #### Input
 The input data to the model, referred to hereafter as the **sensory input**, is a time-discrete multivariate random process which is ingested sequentially one time step at a time.
