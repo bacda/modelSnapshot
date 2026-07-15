@@ -34,30 +34,29 @@ $C^l_t = [,\mathbf{x}^l_{t-1};\mathbf{x}^l_{t-2};\cdots;\mathbf{x}^l_{t-o_l},] \
 whose columns contain the previous $o_l$ observation vectors.
 
 #### Generators
-Each layer contains a set of 'generators', denoted by $\mathbf{G}_k$ . Each generator represents a sparse local temporal regularity represented as a pair $G_k​=(F_k​,r_k)$, where:
+Each layer contains a set of 'generators'. Each generator $\mathbf{G}_k$  represents a sparse local temporal regularity represented as a pair $G_k​=(F_k​,r_k)$, where:
 
 - a **context detector** $F_k$ measures the presence of a characteristic pattern in the lagged context $C$;
 
 - a **prediction vector** $R_k$ specifies a subset of observation dimensions in $x_t$ predicted to become active conditioned on the inferred presence of the context pattern measured by $F_k$
 
-Thus, each active generator contributes a **partial prediction**, and the complete prediction of $x_t$ is not produced by a single generator, but is obtained by composing the predictions of all inferred active generators via a Noisy-OR observation model.
+Thus, each active generator gives only a partial prediction: the complete prediction of $x_t$ is is obtained by composing the predictions of all inferred active generators via a Noisy-OR observation model.
+
+#### Noisy-OR observation model
 
 Conceptually, a generator therefore represents a reusable partial mapping
 
 $$
-g_k : C \rightarrow \hat{x}^{(k)},
+g_k : C \rightarrow R^{(k)},
 $$
 
-where $\hat{x}^{(k)}$ is a sparse prediction over the components of $x_t$. Given the inferred active generators $z_t$, the predicted observation is
+And, given the inferred active generators $z$, the predicted observation is
 
 $$\hat{x}_t=1-\prod_{k:z_{t,k}=1}\left(1-R_k\right),$$
 
-where the product is taken elementwise over the observation dimensions. In the deterministic binary limit, this reduces to
+This is a Noisy-OR product taken elementwise over the observation dimensions. 
 
-$$\hat{x}_t=\bigvee_{k:z_{t,k}=1}R_k.$$
-
-Thus, rather than learning whole transitions $C \rightarrow x_t$, the model learns a dictionary of reusable local temporal regularities whose compositions explain and predict observations.
-
+#### Hierarchy
 Generators at one layer are represented as channels at the layer above, such that the sequence of generator activations inferred as a causal explanation for the current layer's input forms the input for the layer above.
 
 As a whole, the set of generators forms a representation used for interence and prediction: the model interprets the current observation as a composition of generator patterns, and gives a corresponding prediction for the next timestep.
