@@ -20,18 +20,15 @@ ____
 ## Mathematical Model
 
 #### Input
-The input data to the model, referred to hereafter as the **sensory input** is a time-discrete multivariate random process which ingested sequentially one time step at a time.
+The input data to the model, referred to hereafter as the **sensory input**, is a time-discrete multivariate random process which ingested sequentially one time step at a time.
 
 ```math
 X := (X_t)_{t \in \mathbb{N}},
 \qquad
 X_t \in [0,1]^n.
 ```
+The sensory input is only observed by the bottom layer. Layers above the bottom layer likewise have input $X := (X_t)_{t \in \mathbb{N}}$
 
-Likewise, the input 
-At layers above the bottom one, the input is also 
-
-We refer to the input to the bottom layer as the sensory input,
 
 #### Input State Space
 At a fixed time $t$ and layer $l$, the input state space consists of the current observation vector $\mathbf{x}^l_t \in [0,1]^{N_l}$ and an order- $o_l$ context matrix
