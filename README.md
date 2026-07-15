@@ -23,14 +23,14 @@ ____
 
 
 #### Input
-The input data to the model, referred to hereafter as the **sensory input**, is a time-discrete multivariate random process which ingested sequentially one time step at a time.
+The input data to the model, referred to hereafter as the **sensory input**, is a time-discrete multivariate random process which is ingested sequentially one time step at a time.
 
 ```math
 X := (X_t)_{t \in \mathbb{N}},
 \qquad
 X_t \in [0,1]^n, 
 ```
-where the sensory input is only observed by the bottom layer. Layers above the bottom layer likewise have input $X := (X_t)_{t \in \mathbb{N}}$ which corresponds
+where the sensory input is only observed by the bottom layer. Layers above the bottom layer likewise also have input $X := (X_t)_{t \in \mathbb{N}}$ which corresponds with the inferred/expected latent space of  
 
 
 #### Input State Space
