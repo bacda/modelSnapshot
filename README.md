@@ -40,17 +40,18 @@ Each layer contains a set of 'generators'. Each generator $\mathbf{G}_k$  repres
 
 - a **prediction vector** $R_k$ specifies a subset of observation dimensions in $x_t$ predicted to become active conditioned on the inferred presence of the context pattern measured by $F_k$
 
-Thus, each active generator gives only a partial prediction: the complete prediction of $x_t$ is is obtained by composing the predictions of all inferred active generators via a Noisy-OR observation model.
+Thus, each active generator gives only a partial prediction over the observation vector's dimensions, based on the presence of a characteristic pattern inferred in context $C$
 
-#### Noisy-OR observation model
-
-Conceptually, a generator therefore represents a reusable partial mapping
+Generator therefore can be thought of as a reusable partial mapping
 
 $$
 g_k : C \rightarrow R^{(k)},
 $$
 
-And, given the inferred active generators $z$, the predicted observation is
+#### Noisy-OR observation model
+The complete prediction of $x_t$ is is obtained by composing the predictions of all inferred active generators via a Noisy-OR observation model.
+
+iven the inferred active generators $z$, the predicted observation is
 
 $$\hat{x}_t=1-\prod_{k:z_{t,k}=1}\left(1-R_k\right),$$
 
