@@ -42,16 +42,11 @@ Each layer contains a set of 'generators'. Each generator $\mathbf{G}_k$  repres
 
 Thus, each active generator gives only a partial prediction over the observation vector's dimensions, based on the presence of a characteristic pattern inferred in context $C$
 
-Generator therefore can be thought of as a reusable partial mapping
-
-$$
-g_k : C \rightarrow R^{(k)},
-$$
 
 #### Noisy-OR observation model
-The complete prediction of $x_t$ is is obtained by composing the predictions of all inferred active generators via a Noisy-OR observation model.
+As seen above, a generator's prediction specifies only a subset of observation dimensions in $x_t$. The complete prediction for $x_t$ is is obtained by composing the predictions of all inferred active generators via a Noisy-OR observation model.
 
-iven the inferred active generators $z$, the predicted observation is
+Given the inferred active generators $z$, the predicted observation is
 
 $$\hat{x}_t=1-\prod_{k:z_{t,k}=1}\left(1-R_k\right),$$
 
@@ -60,7 +55,7 @@ This is a Noisy-OR product taken elementwise over the observation dimensions.
 #### Hierarchy
 Generators at one layer are represented as channels at the layer above, such that the sequence of generator activations inferred as a causal explanation for the current layer's input forms the input for the layer above.
 
-As a whole, the set of generators forms a representation used for interence and prediction: the model interprets the current observation as a composition of generator patterns, and gives a corresponding prediction for the next timestep.
+The table below sets out the main objects for each layer, showing the shared dimensionalities across layers: the number of generators at one layer corresponds to the number of input channels at the layer above.
 
 
 | layer | input state                                                  | generators $G_k^l​=(F_k^l​,r_k^l)$                               | downward prior $\tau^i$                            |     |
@@ -69,89 +64,6 @@ As a whole, the set of generators forms a representation used for interence and 
 | $l_1$ | $\mathbf{x}_t^1​\in[0,1]^{K_1}​,C_t^1​\in[0,1]^{K_1}$  | $F^1_k \in \mathbb{R}^{n_0 \times o}\quad r^1_k \in [0,1]^{n_0}$ | $\tau^1_{t,k} = f(\mathbf{x}_t^1) \in [0,1]^{n_0}$ |     |
 | $l_0$ | $\mathbf{x}_t^0​\in\{0,1\}^{n_0}​$                     | –                                                                | –                                                  |     |
 
-
-
-### Input
-
-We take as input a time-discrete multivariate process, ingested sequentially.
-
-```math
-X := (X_t)_{t \in \mathbb{N}},
-\qquad
-X_t \in [0,1]^n.
-```
-At the sensory (input) layer, each element $X^0_{t,i}$ represents the presence and "intensity"/amplitude of an event in channel $i$.
-In layers above it, elements $X^{l>0}_{t,i}$ represents the inferred probability that a generator's produced events at the layer below.
-
-More speficially, At layer $l$, the observation vector is
-
-```math
-\mathbf{x}^l_t \in [0,1]^{N_l}.
-```
-
-For the bottom layer, $\mathbf{x}^0_t = X_t$. For higher layers, the observation is the posterior marginal activation vector produced by the layer below:
-
-```math
-\mathbf{x}^{l+1}_t = \boldsymbol{\mu}^l_t.
-```
-
-Thus, adjacent layers satisfy
-
-```math
-N_{l+1} = K_l,
-```
-
-where $K_l$ is the number of generators in layer $l$.
-
-
----
-
-###### **Layers and Generators**
-
-
-
-Each generator $k$ in layer $l$ has:
-
-```math
-G^l_k = (F^l_k, \mathbf{r}^l_k),
-```
-
-where
-
-```math
-F^l_k \in \mathbb{R}_{\geq 0}^{N_l \times o_l}
-```
-
-is an order-$o_l$ temporal filter over the recent context of layer $l$, and
-
-```math
-\mathbf{r}^l_k \in [0,1]^{N_l}
-```
-
-is a prediction vector over the current observation at that layer.
-
-The context matrix is
-
-```math
-C^l_t =
-\begin{bmatrix}
-\mathbf{x}^l_{t-1} & \mathbf{x}^l_{t-2} & \cdots & \mathbf{x}^l_{t-o_l}
-\end{bmatrix}
-\in [0,1]^{N_l \times o_l}.
-```
-
-The filter match for generator $k$ is
-
-```math
-q^l_{t,k}
-=
-\frac{\langle F^l_k, C^l_t\rangle}
-{\|F^l_k\|_1}.
-```
-
-This gives a bottom-up/contextual support value for the generator.
-
----
 
 ###### **Hidden States**
 
