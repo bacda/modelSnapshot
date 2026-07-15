@@ -30,9 +30,7 @@ X := (X_t)_{t \in \mathbb{N}},
 \qquad
 X_t \in [0,1]^n, 
 ```
-Where
-
-The sensory input is only observed by the bottom layer. Layers above the bottom layer likewise have input $X := (X_t)_{t \in \mathbb{N}}$ which corresponds
+where the sensory input is only observed by the bottom layer. Layers above the bottom layer likewise have input $X := (X_t)_{t \in \mathbb{N}}$ which corresponds
 
 
 #### Input State Space
