@@ -30,7 +30,7 @@ X := (X_t)_{t \in \mathbb{N}},
 \qquad
 X_t \in [0,1]^n, 
 ```
-where the sensory input is only observed by the bottom layer. Layers above the bottom layer likewise also have input $X := (X_t)_{t \in \mathbb{N}}$ which corresponds with the inferred/expected latent space of  
+where the sensory input is only observed by the bottom layer. All layers above the bottom layer likewise also have input $X := (X_t)_{t \in \mathbb{N}}$ which is given by the posterior expectation over hidden states of the layer below.
 
 
 #### Input State Space
