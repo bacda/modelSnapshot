@@ -45,7 +45,7 @@ Each layer contains a set of 'generators'. Each generator $\mathbf{G}_k$  repres
 
 - a **prediction vector** $R_k$ specifies a subset of observation dimensions in $x_t$ predicted to become active conditioned on the inferred presence of the context pattern measured by $F_k$
 
-Since $R_k$ has the same dimension as $x_t$ each generator formally maps $C \to \mathbb{R}^n. However, in general, each active generator effectively gives a partial prediction over a subset observation vector's dimensions, based on the presence of a characteristic pattern inferred in context $C$. 
+Since $R_k$ has the same dimension as $x_t$ each generator formally maps $C \to \mathbb{R}^n$. However, in general, each active generator effectively gives a partial positive prediction over a subset observation vector's dimensions, based on the presence of a characteristic pattern inferred in context $C$: A prediction of 0 for a specific channel does not constitute negative evidence.
 
 #### A factorial latent representation
 We introduce a binary hidden state $z_k$ representing the presence of the pattern encoded by $G_k$ as an active explanation for the current observation $x_t$. Since many generators can jointly explain $x_t$, the corresponding latent representation is factorial.
