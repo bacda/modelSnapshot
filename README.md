@@ -67,7 +67,7 @@ where
 
 - a **prediction vector** $R_k$ assigns a Bernoulli activation probability to each observation dimension in $x_t$, conditioned on the inferred presence of the context pattern measured by $F_k$.
 
-Each active generator effectively gives a partial positive prediction over a subset of the observation vector's dimensions, based on the presence of a characteristic pattern inferred in the context $C$. A prediction of $0$ for a specific channel does not constitute negative evidence.
+Each active generator effectively gives a partial positive prediction over a subset of the observation vector's dimensions, based on the presence of a characteristic pattern inferred in the context $C$. A prediction of $0$ for a specific channel by a specific $GG therefore does not constitute negative evidence, only absence of positive evidence.
 
 ---
 
