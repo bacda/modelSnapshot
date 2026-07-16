@@ -79,7 +79,7 @@ We introduce a binary hidden state $z_k$ representing the presence of the patter
 
 #### Noisy-OR observation model
 
-As seen above, a generator's prediction specifies only a subset of observation dimensions in $x_t$. The complete prediction for $x_t$ is obtained by composing the predictions of all inferred active generators via a Noisy-OR observation model.
+As seen above, a generator's prediction typically specifies only positive evidence over a subset of observation dimensions in $x_t$. The complete prediction for $x_t$ is obtained by composing the predictions of all inferred active generators via a Noisy-OR observation model.
 
 Given the inferred active generators $z$, the predicted observation is
 
