@@ -66,11 +66,12 @@ Generators at one layer are represented as channels at the layer above, such tha
 The table below sets out the main objects for each layer, showing the shared dimensionalities across layers: the number of generators at one layer corresponds to the number of input channels at the layer above.
 
 
-| layer | input state                                                  | generators $G_k^l​=(F_k^l​,r_k^l)$                               | downward prior $\tau^i$                            |     |
-| ----- | ------------------------------------------------------ | ---------------------------------------------------------------- | -------------------------------------------------- | --- |
-| $l_2$ | $\mathbf{x}_t^2​\in[0,1]^{K_2}​, C_t^2​\in[0,1]^{K_2}$ | $F^2_k \in \mathbb{R}^{K_1 \times o}\quad r^2_k \in [0,1]^{K_1}$ | $\tau^2_{t,k} = f(\mathbf{x}_t^2) \in [0,1]^{K_1}$ |     |
-| $l_1$ | $\mathbf{x}_t^1​\in[0,1]^{K_1}​,C_t^1​\in[0,1]^{K_1}$  | $F^1_k \in \mathbb{R}^{n_0 \times o}\quad r^1_k \in [0,1]^{n_0}$ | $\tau^1_{t,k} = f(\mathbf{x}_t^1) \in [0,1]^{n_0}$ |     |
-| $l_0$ | $\mathbf{x}_t^0​\in\{0,1\}^{n_0}​$                     | –                                                                | –                                                  |     |
+
+| layer | input state                                            | output state                                           | generators $G_k^l​=(F_k^l​,r_k^l)$                               | hidden state            | downward prior $\tau^i$                            |
+| ----- | ------------------------------------------------------ | ------------------------------------------------------ | ---------------------------------------------------------------- | ----------------------- | -------------------------------------------------- |
+| $l_2$ | $\mathbf{x}_t^1​\in[0,1]^{K_1}​,C_t^1​\in[0,1]^{K_1}$  | $\mathbf{x}_t^2​\in[0,1]^{K_2}​, C_t^2​\in[0,1]^{K_2}$ | $F^2_k \in \mathbb{R}^{K_1 \times o}\quad r^2_k \in [0,1]^{K_1}$ | $z_2 \in \{0,1\}^{K_2}$ | $\tau^2_{t,k} = f(\mathbf{x}_t^2) \in [0,1]^{K_1}$ |
+| $l_1$ | $\mathbf{x}_t^0​\in[0,1]^{n_0}​, C_t^1​\in[0,1]^{n_0}$ | $\mathbf{x}_t^1​\in[0,1]^{K_1}​,C_t^1​\in[0,1]^{K_1}$  | $F^1_k \in \mathbb{R}^{n_0 \times o}\quad r^1_k \in [0,1]^{n_0}$ | $z_1 \in \{0,1\}^{K_1}$ | $\tau^1_{t,k} = f(\mathbf{x}_t^1) \in [0,1]^{n_0}$ |
+| $l_0$ | n/a                                                    | $\mathbf{x}_t^0​\in[0,1]^{n_0}​, C_t^1​\in[0,1]^{n_0}$ | n/a                                                              | n/a                     | n/a                                                |
 
 
 ###### **Hidden States**
