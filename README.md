@@ -28,51 +28,86 @@ The input data to the model, referred to hereafter as the **sensory input**, is 
 ```math
 X := (X_t)_{t \in \mathbb{N}},
 \qquad
-X_t \in [0,1]^n, 
+X_t \in [0,1]^n,
 ```
+
 where the sensory input is only observed by the bottom layer. All layers above the bottom layer likewise also have input $X := (X_t)_{t \in \mathbb{N}}$ which is given by the posterior expectation over hidden states of the layer below.
 
+---
 
 #### Input State Space
-At a fixed time $t$ and layer $l$, the input state space consists of the current observation vector $\mathbf{x}^l_t \in [0,1]^{N_l}$ and an order- $o_l$ context matrix
-$C^l_t = [,\mathbf{x}^l_{t-1};\mathbf{x}^l_{t-2};\cdots;\mathbf{x}^l_{t-o_l},] \in [0,1]^{N_l \times o_l}$,
+
+At a fixed time $t$ and layer $l$, the input state space consists of the current observation vector $\mathbf{x}^l_t \in [0,1]^{N_l}$ and an order-$o_l$ context matrix
+
+```math
+C^l_t =
+[\mathbf{x}^l_{t-1};
+ \mathbf{x}^l_{t-2};
+ \cdots;
+ \mathbf{x}^l_{t-o_l}]
+\in
+[0,1]^{N_l \times o_l},
+```
+
 whose columns contain the previous $o_l$ observation vectors.
 
+---
+
 #### Generators
-Each layer contains a set of 'generators'. Each generator $\mathbf{G}_k$  represents a sparse local temporal regularity represented as a pair $G_k​=(F_k​,r_k)$, where:
+
+Each layer contains a set of generators. Each generator $\mathbf{G}_k$ represents a sparse local temporal regularity represented as a pair
+
+```math
+G_k=(F_k,R_k),
+```
+
+where
 
 - a **context detector** $F_k$ measures the presence of a characteristic pattern in the lagged context $C$;
 
-- a **prediction vector** $R_k$ specifies a subset of observation dimensions in $x_t$ predicted to become active conditioned on the inferred presence of the context pattern measured by $F_k$
+- a **prediction vector** $R_k$ assigns a Bernoulli activation probability to each observation dimension in $x_t$, conditioned on the inferred presence of the context pattern measured by $F_k$.
 
-Since $R_k$ has the same dimension as $x_t$ each generator formally maps $C \to \mathbb{R}^n$. However, in general, each active generator effectively gives a partial positive prediction over a subset observation vector's dimensions, based on the presence of a characteristic pattern inferred in context $C$: A prediction of 0 for a specific channel does not constitute negative evidence.
+Each active generator effectively gives a partial positive prediction over a subset of the observation vector's dimensions, based on the presence of a characteristic pattern inferred in the context $C$. A prediction of $0$ for a specific channel does not constitute negative evidence.
+
+---
 
 #### A factorial latent representation
+
 We introduce a binary hidden state $z_k$ representing the presence of the pattern encoded by $G_k$ as an active explanation for the current observation $x_t$. Since many generators can jointly explain $x_t$, the corresponding latent representation is factorial.
 
+---
 
 #### Noisy-OR observation model
-As seen above, a generator's prediction specifies only a subset of observation dimensions in $x_t$. The complete prediction for $x_t$ is is obtained by composing the predictions of all inferred active generators via a Noisy-OR observation model.
+
+As seen above, a generator's prediction specifies only a subset of observation dimensions in $x_t$. The complete prediction for $x_t$ is obtained by composing the predictions of all inferred active generators via a Noisy-OR observation model.
 
 Given the inferred active generators $z$, the predicted observation is
 
-$$\hat{x}_t=1-\prod_{k:z_{t,k}=1}\left(1-R_k\right),$$
+```math
+\hat{x}_{t,i}
+=
+1-
+\prod_k
+\left(
+1-z_{t,k}R_{k,i}
+\right).
+```
 
-This is a Noisy-OR product taken elementwise over the observation dimensions. 
+This is a Noisy-OR product taken elementwise over the observation dimensions.
+
+---
 
 #### Hierarchy
-Generators at one layer are represented as channels at the layer above, such that the sequence of generator activations inferred as a causal explanation for the current layer's input forms the input for the layer above.
+
+The posterior expectations of generator activations at one layer are represented as channels at the layer above, such that the sequence of inferred generator activations forms the input to the layer above.
 
 The table below sets out the main objects for each layer, showing the shared dimensionalities across layers: the number of generators at one layer corresponds to the number of input channels at the layer above.
 
-
-
-| layer | input state                                            | output state                                           | generators $G_k^l​=(F_k^l​,r_k^l)$                               | hidden state            | downward prior $\tau^i$                            |
-| ----- | ------------------------------------------------------ | ------------------------------------------------------ | ---------------------------------------------------------------- | ----------------------- | -------------------------------------------------- |
-| $l_2$ | $\mathbf{x}_t^1​\in[0,1]^{K_1}​,C_t^1​\in[0,1]^{K_1}$  | $\mathbf{x}_t^2​\in[0,1]^{K_2}​, C_t^2​\in[0,1]^{K_2}$ | $F^2_k \in \mathbb{R}^{K_1 \times o}\quad r^2_k \in [0,1]^{K_1}$ | $z_2 \in \{0,1\}^{K_2}$ | $\tau^2_{t,k} = f(\mathbf{x}_t^2) \in [0,1]^{K_1}$ |
-| $l_1$ | $\mathbf{x}_t^0​\in[0,1]^{n_0}​, C_t^1​\in[0,1]^{n_0}$ | $\mathbf{x}_t^1​\in[0,1]^{K_1}​,C_t^1​\in[0,1]^{K_1}$  | $F^1_k \in \mathbb{R}^{n_0 \times o}\quad r^1_k \in [0,1]^{n_0}$ | $z_1 \in \{0,1\}^{K_1}$ | $\tau^1_{t,k} = f(\mathbf{x}_t^1) \in [0,1]^{n_0}$ |
-| $l_0$ | n/a                                                    | $\mathbf{x}_t^0​\in[0,1]^{n_0}​, C_t^1​\in[0,1]^{n_0}$ | n/a                                                              | n/a                     | n/a                                                |
-
+| layer | input state | output state | generators $G_k^l=(F_k^l,R_k^l)$ | hidden state | downward prior |
+|------|-------------|--------------|----------------------------------|--------------|----------------|
+| $l_2$ | $\mathbf{x}_t^1\in[0,1]^{K_1},\;C_t^2\in[0,1]^{K_1\times o_2}$ | $\mathbf{x}_t^2\in[0,1]^{K_2},\;C_t^3\in[0,1]^{K_2\times o_3}$ | $F_k^2\in\mathbb{R}^{K_1\times o_2},\quad R_k^2\in[0,1]^{K_1}$ | $\mathbf{z}_t^2\in\{0,1\}^{K_2}$ | $\boldsymbol{\tau}_t^2=f(\mathbf{x}_t^2)\in[0,1]^{K_2}$ |
+| $l_1$ | $\mathbf{x}_t^0\in[0,1]^{n_0},\;C_t^1\in[0,1]^{n_0\times o_1}$ | $\mathbf{x}_t^1\in[0,1]^{K_1},\;C_t^2\in[0,1]^{K_1\times o_2}$ | $F_k^1\in\mathbb{R}^{n_0\times o_1},\quad R_k^1\in[0,1]^{n_0}$ | $\mathbf{z}_t^1\in\{0,1\}^{K_1}$ | $\boldsymbol{\tau}_t^1=f(\mathbf{x}_t^1)\in[0,1]^{K_1}$ |
+| $l_0$ | n/a | $\mathbf{x}_t^0\in[0,1]^{n_0},\;C_t^1\in[0,1]^{n_0\times o_1}$ | n/a | n/a | n/a |
 
 ###### **Hidden States**
 
