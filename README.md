@@ -73,7 +73,30 @@ Each active generator effectively gives a partial positive prediction over a sub
 
 #### A factorial latent representation
 
-We introduce a binary hidden state $z_k$ representing the presence of the pattern encoded by $G_k$ as an active explanation for the current observation $x_t$. Since many generators can jointly explain $x_t$, the corresponding latent representation is factorial.
+We introduce a binary hidden state $z_k$ representing the presence of the pattern encoded by $G_k$ as an active explanation for the current observation $x_t$. Since many generators can jointly explain $x_t$, the corresponding latent representation is factorial. 
+
+###### **Hidden States**
+
+For each layer $l$, we introduce binary hidden variables
+
+```math
+z^l_{t,k} \in \{0,1\},
+```
+
+where $z^l_{t,k}=1$ means that generator $k$ is active as a latent cause of the current observation $\mathbf{x}^l_t$.
+
+The full latent state is the binary vector
+
+```math
+\mathbf{z}^l_t =
+(z^l_{t,1}, \dots, z^l_{t,K_l})
+\in \{0,1\}^{K_l}.
+```
+
+This is a sparse distributed representation: multiple generators may be active simultaneously. This is what allows an observation to be represented compositionally, as a combination of latent causes rather than as a single mutually exclusive state.
+
+---
+
 
 ---
 
@@ -116,27 +139,6 @@ The table below sets out the main objects for each layer, showing the shared dim
 -Repeat down the hierarchy.
 -bottom level reached. All layers now have the (predictive) prior ready for the next observation
 
-###### **Hidden States**
-
-For each layer $l$, we introduce binary hidden variables
-
-```math
-z^l_{t,k} \in \{0,1\},
-```
-
-where $z^l_{t,k}=1$ means that generator $k$ is active as a latent cause of the current observation $\mathbf{x}^l_t$.
-
-The full latent state is the binary vector
-
-```math
-\mathbf{z}^l_t =
-(z^l_{t,1}, \dots, z^l_{t,K_l})
-\in \{0,1\}^{K_l}.
-```
-
-This is a sparse distributed representation: multiple generators may be active simultaneously. This is what allows an observation to be represented compositionally, as a combination of latent causes rather than as a single mutually exclusive state.
-
----
 
 ###### **Generator Activation Prior**
 
@@ -215,9 +217,9 @@ If all generators are selected, this reduces to the full hidden state space. Oth
 
 ---
 
-###### **Prior Over Candidate States**
+###### **Prior Over Hidden States**
 
-For a candidate state $\mathbf{z}_{t,m}^l \in \mathcal{S}^l_t$, the unnormalised Bernoulli product prior is
+For a state $\mathbf{z}_{t,m}^l \in \mathcal{S}^l_t$, the unnormalised Bernoulli product prior is
 
 ```math
 \tilde{\pi}^l_{t,m}
@@ -440,4 +442,197 @@ The generators therefore serve two roles:
 This makes the representation compositional: an observation can be explained by several active generators, each accounting for part of the multivariate signal.
 
 Rather than thinking of higher layers as simply storing nested chunks, a better picture is that each layer produces a moving field of posterior beliefs. These posterior beliefs become the signal observed by the next layer, while higher layers return top-down support that shapes the priors of lower-layer generators.
+
+# Experiment framework
+
+An experiment is a collection of independent runs derived from one shared model state.
+The inference model itself does not contain an `Experiment` object. Experiments are an
+orchestration and filesystem layer built on the existing patch-based `.state` format.
+
+## Core model
+
+Each run starts from:
+
+```text
+resolved run state = shared.state + variation.state
+```
+
+`shared.state` is a complete parent state. A run's `variation.state` is a child patch
+that contains only the fields that differ for that run. Omitted fields are inherited
+from `shared.state` through the normal state-loading rules.
+
+A single-run experiment uses the same structure. Its variation may be empty, so the
+resolved starting state is simply `shared.state`.
+
+## Folder layout
+
+Experiments are stored below the project-local library:
+
+```text
+Library/
+  Experiments/
+    exp_YY-MM-DD_HH-MM/
+      experiment.json
+      shared.state
+      runs/
+        000_baseline/
+          variation.state
+          resolved_start.state
+          final.state
+          log.jsonl
+          diagnostics.json
+        001_generated_seed_.../
+          variation.state
+          resolved_start.state
+          final.state
+          log.jsonl
+          diagnostics.json
+```
+
+### `experiment.json`
+
+The manifest is the GUI's table of contents. It stores the experiment name, steps per
+run, run ordering, run status, seeds, and paths to each run's files. It does not replace
+the `.state` format.
+
+### `shared.state`
+
+A complete state common to all runs. This normally contains the input sequence,
+hierarchy dimensions, initial context, generator matrices and parameters, candidate
+selection settings, EM settings, and the experiment comment.
+
+### `variation.state`
+
+A partial state patch for one run. It can be empty for a baseline run. Generated runs
+materialize concrete variation files immediately, rather than storing an abstract
+randomization recipe. This makes the experiment reproducible even if the generator UI
+or code changes later.
+
+### `resolved_start.state`
+
+The complete state obtained after loading `shared.state` and applying the run's
+`variation.state`. This is the exact checkpoint used to start the run.
+
+### `final.state`
+
+The learned state after the configured number of steps.
+
+### `log.jsonl`
+
+The full run trace, including state snapshots and per-step layer values.
+
+### `diagnostics.json`
+
+The summary diagnostics computed for the completed run.
+
+## Run execution
+
+Every experiment run is independent:
+
+1. Load `shared.state`.
+2. Apply the selected run's `variation.state` patch.
+3. Save the result as `resolved_start.state`.
+4. Execute the configured number of steps.
+5. Save `final.state`, `log.jsonl`, and `diagnostics.json`.
+6. Update the run entry in `experiment.json`.
+
+A run never starts from another run's final state unless that final state is explicitly
+made into a new shared state.
+
+## Generate Runs
+
+`Generate Runs...` creates many concrete child variation files. Matrix and scalar
+variations can be combined in the same sweep.
+
+### R and F
+
+`R` and `F` can be randomized independently. Their entries use the model's existing
+Beta initializer:
+
+```text
+R RANDOM alphaR betaR seedR
+F RANDOM alphaF betaF seedF
+```
+
+Each layer receives deterministic seeds derived from the run seed. Filter rows are
+normalized by the existing state loader after sampling.
+
+`R` and `F` currently support Beta randomization only; they are not linear-grid
+parameters.
+
+### Scalar generator parameters
+
+The following generator parameters can each be set to one of three modes:
+
+- **Inherit**: keep the value from `shared.state`.
+- **Random uniform**: sample independently for every generator in every layer from the
+  selected `[minimum, maximum]` interval.
+- **Linear grid**: use evenly spaced values between the selected minimum and maximum.
+  A grid value is applied to all generators in all layers for that run.
+
+Supported generator parameters:
+
+- base rate
+- bottom-up weight
+- evidence amplitude
+- centering
+
+### EM parameters
+
+The same inherit/random/grid modes are available for:
+
+- EM enabled (`0` or `1`)
+- R learning rate
+- F learning rate
+- base-rate learning rate
+- EM epsilon
+- observation binarization (`0` or `1`)
+- observation threshold
+
+A sampled or gridded EM value is applied to every layer in that run. Boolean settings
+use `0` for false and `1` for true. Linear grids for boolean fields use the two endpoints;
+random boolean values are sampled uniformly from the selected interval and thresholded
+at `0.5`.
+
+### Combining grids and randomization
+
+All scalar parameters in **Linear grid** mode form a Cartesian product. For example:
+
+```text
+base grid:       0.05, 0.10, 0.15
+eta R grid:      0.001, 0.005
+```
+
+creates `3 x 2 = 6` grid points.
+
+If any parameter is random, the **Random samples / grid point** value controls how many
+independent random runs are generated for every grid point. For example, six grid
+points with four random samples per point produce 24 runs.
+
+Random parameters include optional R/F randomization and scalar fields in **Random
+uniform** mode. When no random parameter is selected, each grid point produces exactly
+one run.
+
+The generator enforces a 10,000-run safety limit.
+
+## Reproducibility
+
+Every generated run has a stored run seed. More importantly, the generated
+`variation.state` is concrete:
+
+- R/F random directives contain fixed seeds and Beta shapes.
+- Random scalar generator values are written into a complete `PARAMETERS` matrix.
+- Random and gridded EM values are written into a complete `EM` directive.
+
+Therefore the experiment can be rerun from its folder without consulting the original
+generation dialog.
+
+## Editing and inspection
+
+The main GUI continues to display one live model state. The experiment window manages
+which run is selected and can load a run's resolved start or final state. Selecting a
+completed run loads its final state automatically.
+
+Use **Show Variation** to inspect the exact child patch associated with a run. This is
+the clearest way to verify which fields differ from the shared state.
 
