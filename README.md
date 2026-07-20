@@ -108,6 +108,14 @@ The table below sets out the main objects for each layer, showing the shared dim
 | $l_2$ | $\mathbf{x}_t^1\in[0,1]^{K_1},\;C_t^2\in[0,1]^{K_1\times o_2}$ | $\mathbf{x}_t^2\in[0,1]^{K_2},\;C_t^3\in[0,1]^{K_2\times o_3}$ | $F_k^2\in\mathbb{R}^{K_1\times o_2},\quad R_k^2\in[0,1]^{K_1}$ | $\mathbf{z}_t^2\in\{0,1\}^{K_2}$ | $\boldsymbol{\tau}_t^2=f(\mathbf{x}_t^2)\in[0,1]^{K_2}$ |
 | $l_1$ | $\mathbf{x}_t^0\in[0,1]^{n_0},\;C_t^1\in[0,1]^{n_0\times o_1}$ | $\mathbf{x}_t^1\in[0,1]^{K_1},\;C_t^2\in[0,1]^{K_1\times o_2}$ | $F_k^1\in\mathbb{R}^{n_0\times o_1},\quad R_k^1\in[0,1]^{n_0}$ | $\mathbf{z}_t^1\in\{0,1\}^{K_1}$ | $\boldsymbol{\tau}_t^1=f(\mathbf{x}_t^1)\in[0,1]^{K_1}$ |
 
+##### Schedule
+
+-New observation arrives at bottom layer. Posterior computed ad bottom layer, sent upwards.
+-Repeat up the hierarchy.
+-Top level reached. Current observation shifted to context, next-step prior computed
+-Repeat down the hierarchy.
+-bottom level reached. All layers now have the (predictive) prior ready for the next observation
+
 ###### **Hidden States**
 
 For each layer $l$, we introduce binary hidden variables
