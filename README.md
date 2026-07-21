@@ -67,11 +67,11 @@ where
 
 - a **prediction vector** $R_k$ assigns a Bernoulli activation probability to each observation dimension in $x_t$, conditioned on the inferred presence of the context pattern measured by $F_k$.
 
-Each active generator effectively gives a partial positive prediction over a subset of the observation vector's dimensions, based on the presence of a characteristic pattern inferred in the context $C$. A prediction of $0$ for a specific channel by a specific $GG therefore does not constitute negative evidence, only absence of positive evidence.
+Each active generator effectively gives a partial positive prediction: _Partial_ because it is over a subset of the observation vector's dimensions, based on the presence of a characteristic pattern inferred in the context $C$. _Positive_ because a prediction of $0$ for a specific channel by a specific $GG therefore does not constitute negative evidence, only absence of positive evidence. And _partial_ because, correspondibly, channels without positive evidence carry no information and thus the prediction has support only over a subset of channels.
 
 ---
 
-#### A factorial latent representation
+#### Factorial latent representation
 
 We introduce a binary hidden state $z_k$ representing the presence of the pattern encoded by $G_k$ as an active explanation for the current observation $x_t$. Since many generators can jointly explain $x_t$, the corresponding latent representation is factorial. 
 
@@ -361,17 +361,7 @@ Since the prior is an independent Bernoulli product, the update for $F$ is fairl
 
 The update for $R$ is a bit more complicated because it involves the Noisy-OR non-linearity. It involves assigning a responsibility term among generators, derived from the posterior, for each observation channel. Essentially, the posterior is treated as the "true" soft hidden state, and R is adjusted such that the Noisy-OR likelihood more closely aligns with it.
 
-The update for R is a bit more complicated because it involves the Noisy-OR observation model. Unlike the prior, the likelihood is produced by the joint action of all active generators. Consequently, observing that a particular channel became active does not determine which generator should receive credit for predicting it.
-
-Consider an observed channel x
-i
-	​
-
-=1. Even if the posterior indicates that several generators were active, it does not specify which of those generators actually caused the activation of channel i. Updating every active generator equally would generally overestimate their prediction strengths, since the observation may have been sufficiently explained by only one of them.
-
-The M-step therefore first estimates the expected causal contribution of each generator to each observed activation. This quantity is referred to as the responsibility, and represents the fraction of the observed activation attributed to a particular generator under the posterior distribution over hidden states.
-
-The necessary E-step quantities are:
+The update for R is a bit more complicated because it involves the Noisy-OR observation model. Unlike the prior, the likelihood is produced by the joint action of all active generators. Consequently, an observation at a particular channel does not determine how to split credit for predicting it (causal responsibility). Since $>1$ generators can have support over channel $i$, the responsibility term must therefore be proportional to the relative strengh of each generators prediction. This is represented using a responsibility vector.
 
 ```math
 \rho_m
@@ -379,15 +369,6 @@ The necessary E-step quantities are:
 p(\mathbf{z}_m \mid \mathbf{x}, C, \tau),
 ```
 
-and the marginal generator activation
-
-```math
-\mu_k
-=
-\sum_m \rho_m z_{m,k}.
-```
-
-The prediction vectors $R$, filters $F$, and base rates $b$ are then updated.
 
 The prediction update uses a Noisy-OR responsibility term. For generator $k$ and channel $i$, the expected causal credit is approximately
 
