@@ -154,10 +154,10 @@ where $\tau^l_{t,k}$ is top-down support arriving from the layer above. In the c
 
 Each generator has:
 
-- base rate $b_k$,
-- bottom-up weight $w_k$,
-- evidence amplitude $A_k$,
-- centering value $c_k$.
+- base rate $b_k$ specifies the unconditional activation probability, corresponding to the empirical average.
+- bottom-up weight $w_k \in [0,1]$ specifies the weighting applied to the bottom-up evidence against the top-down prior.
+- evidence amplitude $A_k$ specifies how strongly
+- centering value $c_k$ is necessary to ...
 
 The combined evidence is
 
@@ -349,9 +349,27 @@ So the model maintains two time-indexed quantities:
 
 ---
 
-###### **Learning With Online EM / Generalized EM**
+###### **Learning With Expectation Maximisation**
 
-Learning is online. At each timestep, the model first performs an E-step by computing the posterior over candidate hidden states. It then updates generator parameters using posterior responsibilities.
+We implement an online EM/Gemenalized EM learning algorithm.
+
+As we have seen, at each timestep, the model computes a posterior over candidate hidden states. This corresponds to the E-step, since the posterior is then used to compute the expected hidden state under the current model.
+
+The maximisation step then updates the generators such that they would have more closely explained that posterior. So, in essence, $R$ and $F$ are adjusted such that the gap between the prior and the posterior is shortened. Crucially, since $F$ affects only the prior, and $R$ affects only the likelihood, their updates are fundamentally different:
+
+Since the prior is an independent Bernoulli product, the update for $F$ is fairly simple: it is the derivative of F with respect to the error $\mu - \alpha$.
+
+The update for $R$ is a bit more complicated because it involves the Noisy-OR non-linearity. It involves assigning a responsibility term among generators, derived from the posterior, for each observation channel. Essentially, the posterior is treated as the "true" soft hidden state, and R is adjusted such that the Noisy-OR likelihood more closely aligns with it.
+
+The update for R is a bit more complicated because it involves the Noisy-OR observation model. Unlike the prior, the likelihood is produced by the joint action of all active generators. Consequently, observing that a particular channel became active does not determine which generator should receive credit for predicting it.
+
+Consider an observed channel x
+i
+	​
+
+=1. Even if the posterior indicates that several generators were active, it does not specify which of those generators actually caused the activation of channel i. Updating every active generator equally would generally overestimate their prediction strengths, since the observation may have been sufficiently explained by only one of them.
+
+The M-step therefore first estimates the expected causal contribution of each generator to each observed activation. This quantity is referred to as the responsibility, and represents the fraction of the observed activation attributed to a particular generator under the posterior distribution over hidden states.
 
 The necessary E-step quantities are:
 
