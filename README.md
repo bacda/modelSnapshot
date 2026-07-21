@@ -361,7 +361,7 @@ Since the prior is an independent Bernoulli product, the update for $F$ is fairl
 
 The update for $R$ is a bit more complicated because it involves the Noisy-OR non-linearity. It involves assigning a responsibility term among generators, derived from the posterior, for each observation channel. Essentially, the posterior is treated as the "true" soft hidden state, and R is adjusted such that the Noisy-OR likelihood more closely aligns with it.
 
-The update for R is a bit more complicated because it involves the Noisy-OR observation model. Unlike the prior, the likelihood is produced by the joint action of all active generators. Consequently, an observation at a particular channel does not determine how to split credit for predicting it (causal responsibility). Since $>1$ generators can have support over channel $i$, the responsibility term must therefore be proportional to the relative strengh of each generators prediction. This is represented using a responsibility vector.
+The update for R is a bit more complicated because it involves the Noisy-OR observation model. Unlike the prior, the likelihood is produced by the joint action of all active generators. Consequently, an observation at a particular channel does not determine how to split credit for predicting it (causal responsibility). Since $>1$ generators can have support over channel $i$, the responsibility term must therefore be proportional to the relative strengh of each generators prediction. This is, in essence, the same motivation for the responsability term in EM applied to mixture models. 
 
 ```math
 \rho_m
