@@ -355,27 +355,15 @@ We implement an online EM/Generalized EM learning algorithm.
 
 As we have seen, at each timestep, the model computes a posterior over candidate hidden states. This corresponds to the E-step, since the posterior is then used to compute expectations of the hidden variables under the current model. The posterior over candidate states is a probability distribution,
 
-$$
-q_j
-=
-P(\mathbf{z}=\mathbf{z}_j\mid \mathbf{x},C),
-$$
+$$ q_j = P(\mathbf{z}=\mathbf{z}_j\mid \mathbf{x},C), $$
 
 whereas the expected hidden state is its posterior mean,
 
-$$
-\boldsymbol{\mu}
-=
-\sum_j q_j\mathbf{z}_j.
-$$
+$$ \boldsymbol{\mu} = \sum_j q_j\mathbf{z}_j. $$
 
 Thus, each element
 
-$$
-\mu_k
-=
-\sum_j q_jz_{j,k}
-$$
+$$ \mu_k = \sum_j q_jz_{j,k} $$
 
 is the posterior probability that generator $k$ was active.
 
@@ -383,9 +371,7 @@ The maximisation step then updates the generators such that the prior would have
 
 Since the prior is an independent Bernoulli product, the learning signal for $F$ is fairly simple: it is the posterior-prior error
 
-$$
-\boldsymbol{\mu}-\boldsymbol{\alpha},
-$$
+$$ \boldsymbol{\mu}-\boldsymbol{\alpha}, $$
 
 propagated through the function mapping $F$ and the context $C$ to the prior activation probabilities $\boldsymbol{\alpha}$. This essentially shapes each filter into predicting when its corresponding generator should be active. $R$ informs the difference between the prior and the posterior through the likelihood of the current observation: the posterior sees the current observation, whereas the prior sees only the preceding context. Thus, for the error $\boldsymbol{\mu}-\boldsymbol{\alpha}$ to be minimised, the filters must learn the contextual conditions under which their corresponding generators are likely to explain the next observation.
 
@@ -393,79 +379,43 @@ The update to $R$ is a bit more complicated because it involves the Noisy-OR obs
 
 To derive $\delta R$, it is useful to introduce an auxiliary variable that makes the implicit Noisy-OR interpretation explicit. Each active generator can independently cause channel $i$ to become active, so we define
 
-$$
-y_{k,i}\in\{0,1\},
-$$
+$$ y_{k,i}\in{0,1}, $$
 
 where $y_{k,i}=1$ represents a successful transmission of an activation to channel $i$ from generator $k$.
 
 For the following derivation, assume that
 
-$$
-x_i\in\{0,1\}.
-$$
+$$ x_i\in{0,1}. $$
 
 The extension to $x_i\in[0,1]$ treats $x_i$ as fractional Bernoulli evidence, or equivalently as the expectation of an underlying binary observation.
 
 For a particular candidate state $\mathbf{z}_j$,
 
-$$
-P(y_{k,i}=1\mid\mathbf{z}_j)
-=
-z_{j,k}R_{k,i}.
-$$
+$$ P(y_{k,i}=1\mid\mathbf{z}j) = z{j,k}R_{k,i}. $$
 
 The factor $z_{j,k}$ ensures that generator $k$ can transmit only if it is active, while $R_{k,i}$ is its probability of successfully activating channel $i$.
 
 Let
 
-$$
-P_{j,i}
-=
-P(x_i=1\mid\mathbf{z}_j)
-$$
+$$ P_{j,i} = P(x_i=1\mid\mathbf{z}_j) $$
 
 denote the total Noisy-OR probability that candidate state $j$ activates channel $i$:
 
-$$
-P_{j,i}
-=
-1-
-(1-\lambda_i)
-\prod_{\ell}
-\left(1-z_{j,\ell}R_{\ell,i}\right).
-$$
+$$ P_{j,i} = 1- (1-\lambda_i) \prod_{\ell} \left(1-z_{j,\ell}R_{\ell,i}\right). $$
 
 If generator $k$ successfully transmits, then channel $i$ must be active. Therefore,
 
-$$
-P(y_{k,i}=1,x_i=1\mid\mathbf{z}_j)
-=
-z_{j,k}R_{k,i}.
-$$
+$$ P(y_{k,i}=1,x_i=1\mid\mathbf{z}j) = z{j,k}R_{k,i}. $$
 
 Conditioning on the observation $x_i=1$ gives
 
-$$
-P(y_{k,i}=1\mid x_i=1,\mathbf{z}_j)
-=
-\frac{z_{j,k}R_{k,i}}{P_{j,i}}.
-$$
+$$ P(y_{k,i}=1\mid x_i=1,\mathbf{z}j) = \frac{z{j,k}R_{k,i}}{P_{j,i}}. $$
 
 This is the expected responsibility of generator $k$ for channel $i$, conditional on candidate state $j$. It is proportional to the strength of generator $k$'s prediction and inversely proportional to the total probability with which the complete candidate state predicted the channel.
 
 The candidate state is itself uncertain, so this responsibility must then be averaged over the posterior $q_j$. For a binary observation, the resulting posterior expected responsibility is
 
-$$
-\boxed{
-\gamma_{k,i}
-=
-x_i
-\sum_j
-q_j
-\frac{z_{j,k}R_{k,i}}{P_{j,i}}
-}
-$$
+$$ \boxed{ \gamma_{k,i} = x_i \sum_j q_j \frac{z_{j,k}R_{k,i}}{P_{j,i}} } $$
 
 The factor $x_i$ ensures that a successful transmission is credited only when channel $i$ was observed to be active.
 
@@ -475,80 +425,44 @@ Unlike responsibilities in an ordinary mixture model, the responsibilities of th
 
 The posterior marginal
 
-$$
-\mu_k
-=
-\sum_j q_jz_{j,k}
-$$
+$$ \mu_k = \sum_j q_jz_{j,k} $$
 
 has a corresponding interpretation: it is the expected number of transmission opportunities for generator $k$ at the current timestep. If the generator is active, it has one opportunity to activate each channel; if it is inactive, it has none.
 
 The expected complete-data log-likelihood associated with $R_{k,i}$ is therefore
 
-$$Q_{k,i}=\gamma_{k,i}\log R_{k,i}+\left(\mu_k-\gamma_{k,i}\right)\log(1-R_{k,i}).$$
+$$ Q_{k,i} = \gamma_{k,i}\log R_{k,i} + \left(\mu_k-\gamma_{k,i}\right) \log(1-R_{k,i}). $$
 
 Here,
 
-$$
-\gamma_{k,i}
-$$
+$$ \gamma_{k,i} $$
 
 is the expected number of successful transmissions, while
 
-$$
-\mu_k-\gamma_{k,i}
-$$
+$$ \mu_k-\gamma_{k,i} $$
 
 is the expected number of failed transmissions.
 
 Maximising this expression gives
 
-$$
-R_{k,i}^{*}
-=
-\frac{\gamma_{k,i}}{\mu_k}.
-$$
+$$ R_{k,i}^{*} = \frac{\gamma_{k,i}}{\mu_k}. $$
 
 Across multiple timesteps, the corresponding batch EM update would be
 
-$$
-R_{k,i}^{*}
-=
-\frac{\sum_t\gamma_{t,k,i}}
-{\sum_t\mu_{t,k}}.
-$$
+$$ R_{k,i}^{*} = \frac{\sum_t\gamma_{t,k,i}} {\sum_t\mu_{t,k}}. $$
 
 Thus, $R_{k,i}$ is learned as the expected proportion of generator $k$'s activation opportunities that resulted in a successful transmission to channel $i$.
 
 Rather than performing this complete batch maximisation, the online Generalized EM update takes a small step toward the same solution:
 
-$$
-\boxed{
-\delta R_{k,i}
-=
-\eta_R
-\left(
-\gamma_{k,i}
--
-\mu_kR_{k,i}
-\right)
-}
-$$
+$$ \boxed{ \delta R_{k,i} = \eta_R \left( \gamma_{k,i} - \mu_kR_{k,i} \right) } $$
 
 or equivalently,
 
-$$
-\delta R_{k,i}
-=
-\eta_R\mu_k
-\left(
-\frac{\gamma_{k,i}}{\mu_k}
--
-R_{k,i}
-\right).
-$$
+$$ \delta R_{k,i} = \eta_R\mu_k \left( \frac{\gamma_{k,i}}{\mu_k} - R_{k,i} \right). $$
 
 The update therefore moves $R_{k,i}$ toward the inferred rate of successful transmissions, with the size of the update weighted by the posterior probability that generator $k$ was active.
+
 
 ###### **Interpretation**
 
