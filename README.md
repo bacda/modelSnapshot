@@ -353,22 +353,17 @@ So the model maintains two time-indexed quantities:
 
 We implement an online EM/Gemenalized EM learning algorithm.
 
-As we have seen, at each timestep, the model computes a posterior over candidate hidden states. This corresponds to the E-step, since the posterior is then used to compute the expected hidden state under the current model.
+As we have seen, at each timestep, the model computes a posterior over candidate hidden states. This corresponds to the E-step, since the posterior is then used to compute the expected hidden state under the current model. ?? confusing-- isn't the posterior over candidate hidden states _the_ expected hidden state under the current model?
 
 The maximisation step then updates the generators such that they would have more closely explained that posterior. So, in essence, $R$ and $F$ are adjusted such that the gap between the prior and the posterior is shortened. Crucially, since $F$ affects only the prior, and $R$ affects only the likelihood, their updates are fundamentally different:
 
-Since the prior is an independent Bernoulli product, the update for $F$ is fairly simple: it is the derivative of F with respect to the error $\mu - \alpha$.
-
-The update for $R$ is a bit more complicated because it involves the Noisy-OR non-linearity. It involves assigning a responsibility term among generators, derived from the posterior, for each observation channel. Essentially, the posterior is treated as the "true" soft hidden state, and R is adjusted such that the Noisy-OR likelihood more closely aligns with it.
+Since the prior is an independent Bernoulli product, the update for $F$ is fairly simple: it is the derivative of F with respect to the error $\mu - \alpha$. This essentially shapes the filters into predicting R, because R is what informs the difference between the prior and the posterior through the likelihood of a current observation that posterior sees and that the prior doesnt. Thus the filters *must* be predictive of R for the error $\mu - \alpha$ to be minimised, because it 
 
 The update for R is a bit more complicated because it involves the Noisy-OR observation model. Unlike the prior, the likelihood is produced by the joint action of all active generators. Consequently, an observation at a particular channel does not determine how to split credit for predicting it (causal responsibility). Since $>1$ generators can have support over channel $i$, the responsibility term must therefore be proportional to the relative strengh of each generators prediction. This is, in essence, the same motivation for the responsability term in EM applied to mixture models. 
 
-```math
-\rho_m
-=
-p(\mathbf{z}_m \mid \mathbf{x}, C, \tau),
-```
+So, we define responsibility as ...
 
+and
 
 The prediction update uses a Noisy-OR responsibility term. For generator $k$ and channel $i$, the expected causal credit is approximately
 
