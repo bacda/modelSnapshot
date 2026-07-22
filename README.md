@@ -485,14 +485,7 @@ has a corresponding interpretation: it is the expected number of transmission op
 
 The expected complete-data log-likelihood associated with $R_{k,i}$ is therefore
 
-$$
-Q_{k,i}
-=
-\gamma_{k,i}\log R_{k,i}
-+
-\left(\mu_k-\gamma_{k,i}\right)
-\log(1-R_{k,i}).
-$$
+$$Q_{k,i}=\gamma_{k,i}\log R_{k,i}+\left(\mu_k-\gamma_{k,i}\right)\log(1-R_{k,i}).$$
 
 Here,
 
