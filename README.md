@@ -351,68 +351,211 @@ So the model maintains two time-indexed quantities:
 
 ###### **Learning With Expectation Maximisation**
 
-We implement an online EM/Gemenalized EM learning algorithm.
+We implement an online EM/Generalized EM learning algorithm.
 
-As we have seen, at each timestep, the model computes a posterior over candidate hidden states. This corresponds to the E-step, since the posterior is then used to compute the expected hidden state under the current model. ?? confusing-- isn't the posterior over candidate hidden states _the_ expected hidden state under the current model?
+As we have seen, at each timestep, the model computes a posterior over candidate hidden states. This corresponds to the E-step, since the posterior is then used to compute expectations of the hidden variables under the current model. The posterior over candidate states is a probability distribution,
 
-The maximisation step then updates the generators such that they would have more closely explained that posterior. So, in essence, $R$ and $F$ are adjusted such that the gap between the prior and the posterior is shortened. Crucially, since $F$ affects only the prior, and $R$ affects only the likelihood, their updates are fundamentally different:
+$$
+q_j
+=
+P(\mathbf{z}=\mathbf{z}_j\mid \mathbf{x},C),
+$$
 
-Since the prior is an independent Bernoulli product, the update for $F$ is fairly simple: it is the derivative of F with respect to the error $\mu - \alpha$. This essentially shapes the filters into predicting R, because R is what informs the difference between the prior and the posterior through the likelihood of a current observation that posterior sees and that the prior doesnt. Thus the filters *must* be predictive of R for the error $\mu - \alpha$ to be minimised, because it 
+whereas the expected hidden state is its posterior mean,
 
-The update for R is a bit more complicated because it involves the Noisy-OR observation model. Unlike the prior, the likelihood is produced by the joint action of all active generators. Consequently, an observation at a particular channel does not determine how to split credit for predicting it (causal responsibility). Since $>1$ generators can have support over channel $i$, the responsibility term must therefore be proportional to the relative strengh of each generators prediction. This is, in essence, the same motivation for the responsability term in EM applied to mixture models. 
+$$
+\boldsymbol{\mu}
+=
+\sum_j q_j\mathbf{z}_j.
+$$
 
-So, we define responsibility as ...
+Thus, each element
 
-and
+$$
+\mu_k
+=
+\sum_j q_jz_{j,k}
+$$
 
-The prediction update uses a Noisy-OR responsibility term. For generator $k$ and channel $i$, the expected causal credit is approximately
+is the posterior probability that generator $k$ was active.
 
-```math
+The maximisation step then updates the generators such that the prior would have more closely predicted the posterior-inferred hidden state, and the likelihood would have more closely explained the current observation. So, in essence, $F$ is adjusted such that the gap between the prior and the posterior is shortened, while $R$ is adjusted such that the inferred hidden states better explain the observation. Crucially, since $F$ affects only the prior, and $R$ affects only the likelihood, their updates are fundamentally different.
+
+Since the prior is an independent Bernoulli product, the learning signal for $F$ is fairly simple: it is the posterior-prior error
+
+$$
+\boldsymbol{\mu}-\boldsymbol{\alpha},
+$$
+
+propagated through the function mapping $F$ and the context $C$ to the prior activation probabilities $\boldsymbol{\alpha}$. This essentially shapes each filter into predicting when its corresponding generator should be active. $R$ informs the difference between the prior and the posterior through the likelihood of the current observation: the posterior sees the current observation, whereas the prior sees only the preceding context. Thus, for the error $\boldsymbol{\mu}-\boldsymbol{\alpha}$ to be minimised, the filters must learn the contextual conditions under which their corresponding generators are likely to explain the next observation.
+
+The update to $R$ is a bit more complicated because it involves the Noisy-OR observation model. Unlike the prior, the likelihood is produced by the joint action of all active generators, and an observation at a particular channel does not determine which active generator should receive credit for predicting it. Since more than one generator can have support over channel $i$, the learning algorithm must estimate the causal responsibility of each generator for that channel. This is, in essence, the same motivation for the responsibility term in EM applied to mixture models, although here the responsibility is assigned separately for each generator and observation channel.
+
+To derive $\delta R$, it is useful to introduce an auxiliary variable that makes the implicit Noisy-OR interpretation explicit. Each active generator can independently cause channel $i$ to become active, so we define
+
+$$
+y_{k,i}\in\{0,1\},
+$$
+
+where $y_{k,i}=1$ represents a successful transmission of an activation to channel $i$ from generator $k$.
+
+For the following derivation, assume that
+
+$$
+x_i\in\{0,1\}.
+$$
+
+The extension to $x_i\in[0,1]$ treats $x_i$ as fractional Bernoulli evidence, or equivalently as the expectation of an underlying binary observation.
+
+For a particular candidate state $\mathbf{z}_j$,
+
+$$
+P(y_{k,i}=1\mid\mathbf{z}_j)
+=
+z_{j,k}R_{k,i}.
+$$
+
+The factor $z_{j,k}$ ensures that generator $k$ can transmit only if it is active, while $R_{k,i}$ is its probability of successfully activating channel $i$.
+
+Let
+
+$$
+P_{j,i}
+=
+P(x_i=1\mid\mathbf{z}_j)
+$$
+
+denote the total Noisy-OR probability that candidate state $j$ activates channel $i$:
+
+$$
+P_{j,i}
+=
+1-
+(1-\lambda_i)
+\prod_{\ell}
+\left(1-z_{j,\ell}R_{\ell,i}\right).
+$$
+
+If generator $k$ successfully transmits, then channel $i$ must be active. Therefore,
+
+$$
+P(y_{k,i}=1,x_i=1\mid\mathbf{z}_j)
+=
+z_{j,k}R_{k,i}.
+$$
+
+Conditioning on the observation $x_i=1$ gives
+
+$$
+P(y_{k,i}=1\mid x_i=1,\mathbf{z}_j)
+=
+\frac{z_{j,k}R_{k,i}}{P_{j,i}}.
+$$
+
+This is the expected responsibility of generator $k$ for channel $i$, conditional on candidate state $j$. It is proportional to the strength of generator $k$'s prediction and inversely proportional to the total probability with which the complete candidate state predicted the channel.
+
+The candidate state is itself uncertain, so this responsibility must then be averaged over the posterior $q_j$. For a binary observation, the resulting posterior expected responsibility is
+
+$$
+\boxed{
 \gamma_{k,i}
 =
 x_i
-\sum_m
-\rho_m
-z_{m,k}
-\frac{r_{k,i}}{\hat{x}_{m,i}}.
-```
+\sum_j
+q_j
+\frac{z_{j,k}R_{k,i}}{P_{j,i}}
+}
+$$
 
-The prediction vector update is
+The factor $x_i$ ensures that a successful transmission is credited only when channel $i$ was observed to be active.
 
-```math
-\Delta r_{k,i}
+When $x_i$ is binary, $\gamma_{k,i}$ is the posterior expected number of successful transmissions. When $x_i\in[0,1]$, the same expression assigns the available fractional positive evidence among the generators. In this case, the update is a Generalized EM step for a soft Bernoulli cross-entropy objective rather than an exact EM update for a directly observed binary Noisy-OR variable.
+
+Unlike responsibilities in an ordinary mixture model, the responsibilities of the generators for one channel do not necessarily sum to one. Noisy-OR allows several generators to transmit successfully at the same time. Therefore, $\gamma_{k,i}$ is an expected successful transmission rather than an exclusive fraction of the observation assigned to generator $k$.
+
+The posterior marginal
+
+$$
+\mu_k
+=
+\sum_j q_jz_{j,k}
+$$
+
+has a corresponding interpretation: it is the expected number of transmission opportunities for generator $k$ at the current timestep. If the generator is active, it has one opportunity to activate each channel; if it is inactive, it has none.
+
+The expected complete-data log-likelihood associated with $R_{k,i}$ is therefore
+
+$$
+Q_{k,i}
+=
+\gamma_{k,i}\log R_{k,i}
++
+\left(\mu_k-\gamma_{k,i}\right)
+\log(1-R_{k,i}).
+$$
+
+Here,
+
+$$
+\gamma_{k,i}
+$$
+
+is the expected number of successful transmissions, while
+
+$$
+\mu_k-\gamma_{k,i}
+$$
+
+is the expected number of failed transmissions.
+
+Maximising this expression gives
+
+$$
+R_{k,i}^{*}
+=
+\frac{\gamma_{k,i}}{\mu_k}.
+$$
+
+Across multiple timesteps, the corresponding batch EM update would be
+
+$$
+R_{k,i}^{*}
+=
+\frac{\sum_t\gamma_{t,k,i}}
+{\sum_t\mu_{t,k}}.
+$$
+
+Thus, $R_{k,i}$ is learned as the expected proportion of generator $k$'s activation opportunities that resulted in a successful transmission to channel $i$.
+
+Rather than performing this complete batch maximisation, the online Generalized EM update takes a small step toward the same solution:
+
+$$
+\boxed{
+\delta R_{k,i}
 =
 \eta_R
-(\gamma_{k,i} - \mu_k r_{k,i}).
-```
+\left(
+\gamma_{k,i}
+-
+\mu_kR_{k,i}
+\right)
+}
+$$
 
-This increases $r_{k,i}$ when generator $k$ receives posterior responsibility for explaining an active channel, and decreases it when the generator is active but the channel is not supported.
+or equivalently,
 
-The filter update tries to make the contextual activation prior $\alpha_k$ better match the posterior marginal $\mu_k$. The current update is a gradient-like rule:
-
-```math
-\Delta F_{k,a,b}
+$$
+\delta R_{k,i}
 =
-\eta_F
-(\mu_k-\alpha_k)
-A_k w_k
-\frac{C_{a,b}-q_k}
-{\epsilon + \sum_{a,b} F_{k,a,b}}.
-```
+\eta_R\mu_k
+\left(
+\frac{\gamma_{k,i}}{\mu_k}
+-
+R_{k,i}
+\right).
+$$
 
-The base rate update is
-
-```math
-\Delta b_k
-=
-\eta_b(\mu_k-b_k).
-```
-
-Thus, the model is not performing a closed-form batch M-step. It is better described as an online EM / generalized EM procedure.
-
-The parameters $w_k$, $A_k$, $c_k$, candidate thresholds, and learning rates are currently user-editable controls rather than automatically learned parameters.
-
----
+The update therefore moves $R_{k,i}$ toward the inferred rate of successful transmissions, with the size of the update weighted by the posterior probability that generator $k$ was active.
 
 ###### **Interpretation**
 
